@@ -1,6 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -24,6 +25,7 @@ namespace UniversalExcelTool.UI.ViewModels
         private readonly IUILogger _logger;
         private readonly IProgressReporter _progressReporter;
         private readonly UnifiedConfigurationManager _configManager;
+        private AvaloniaLogger? _processLogger;
 
         public DatabaseLoaderViewModel()
         {
@@ -49,12 +51,17 @@ namespace UniversalExcelTool.UI.ViewModels
                 BusyMessage = "Loading data to database...";
                 _progressReporter.Reset();
 
-                var stopwatch = Stopwatch.StartNew();
-                _logger.LogInfo("═══════════════════════════════════════════", "loader");
-                _logger.LogInfo("Starting Database Loader", "loader");
-                _logger.LogInfo("═══════════════════════════════════════════", "loader");
+                // Create file logger for this session
+                var logFileName = $"UI_DatabaseLoader_{DateTime.Now:yyyyMMdd_HHmmss}.txt";
+                var logPath = Path.Combine(_configManager.GetLogFilesPath(), logFileName);
+                _processLogger = new AvaloniaLogger(LogEntries, logPath);
 
-                var orchestrator = new ETLOrchestratorWithLogger(_logger, _progressReporter);
+                var stopwatch = Stopwatch.StartNew();
+                _processLogger.LogInfo("═══════════════════════════════════════════", "loader");
+                _processLogger.LogInfo("Starting Database Loader", "loader");
+                _processLogger.LogInfo("═══════════════════════════════════════════", "loader");
+
+                var orchestrator = new ETLOrchestratorWithLogger(_processLogger, _progressReporter);
                 var options = new ETLProcessOptions
                 {
                     SkipDynamicTableConfig = true

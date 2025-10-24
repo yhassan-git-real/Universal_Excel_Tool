@@ -1,6 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -40,6 +41,7 @@ namespace UniversalExcelTool.UI.ViewModels
         private readonly IUILogger _logger;
         private readonly IProgressReporter _progressReporter;
         private readonly UnifiedConfigurationManager _configManager;
+        private AvaloniaLogger? _processLogger;
 
         public DashboardViewModel()
         {
@@ -121,13 +123,18 @@ namespace UniversalExcelTool.UI.ViewModels
                 BusyMessage = "Running Complete ETL Process...";
                 _progressReporter.Reset();
                 
+                // Create file logger for this ETL session
+                var logFileName = $"UI_CompleteETL_{DateTime.Now:yyyyMMdd_HHmmss}.txt";
+                var logPath = Path.Combine(_configManager.GetLogFilesPath(), logFileName);
+                _processLogger = new AvaloniaLogger(LogEntries, logPath);
+                
                 var stopwatch = Stopwatch.StartNew();
-                _logger.LogInfo("═══════════════════════════════════════════", "etl");
-                _logger.LogInfo("Starting Complete ETL Process", "etl");
-                _logger.LogInfo("═══════════════════════════════════════════", "etl");
+                _processLogger.LogInfo("═══════════════════════════════════════════", "etl");
+                _processLogger.LogInfo("Starting Complete ETL Process", "etl");
+                _processLogger.LogInfo("═══════════════════════════════════════════", "etl");
 
-                // Create orchestrator with UI logger
-                var orchestrator = new ETLOrchestratorWithLogger(_logger, _progressReporter);
+                // Create orchestrator with file logger
+                var orchestrator = new ETLOrchestratorWithLogger(_processLogger, _progressReporter);
                 
                 // Execute ETL process
                 bool success = await Task.Run(() => orchestrator.RunCompleteETLProcessAsync());
@@ -136,7 +143,8 @@ namespace UniversalExcelTool.UI.ViewModels
 
                 if (success)
                 {
-                    _logger.LogSuccess($"ETL process completed successfully in {stopwatch.Elapsed:hh\\:mm\\:ss}");
+                    _processLogger.LogSuccess($"ETL process completed successfully in {stopwatch.Elapsed:hh\\:mm\\:ss}");
+                    _processLogger.LogInfo($"Log file saved: {logPath}", "system");
                     _progressReporter.ReportComplete(true, stopwatch.Elapsed, "All modules executed successfully");
                     
                     // Update execution info
@@ -150,7 +158,8 @@ namespace UniversalExcelTool.UI.ViewModels
                 }
                 else
                 {
-                    _logger.LogError($"ETL process completed with errors in {stopwatch.Elapsed:hh\\:mm\\:ss}");
+                    _processLogger.LogError($"ETL process completed with errors in {stopwatch.Elapsed:hh\\:mm\\:ss}");
+                    _processLogger.LogInfo($"Log file saved: {logPath}", "system");
                     _progressReporter.ReportComplete(false, stopwatch.Elapsed, "Process completed with errors");
                     LastExecutionInfo = $"Last run: {DateTime.Now:yyyy-MM-dd HH:mm:ss} (Failed)";
                     
@@ -162,7 +171,7 @@ namespace UniversalExcelTool.UI.ViewModels
             }
             catch (Exception ex)
             {
-                _logger.LogError($"ETL execution failed: {ex.Message}");
+                _processLogger?.LogError($"ETL execution failed: {ex.Message}");
                 _progressReporter.ReportError(ex.Message);
                 LastExecutionInfo = $"Last run: {DateTime.Now:yyyy-MM-dd HH:mm:ss} (Error)";
                 
