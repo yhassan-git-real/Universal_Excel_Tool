@@ -1,0 +1,60 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <AssemblyName>UniversalExcelTool.UI</AssemblyName>
+    <RootNamespace>UniversalExcelTool.UI</RootNamespace>
+    <AssemblyTitle>Universal Excel Tool - Modern UI</AssemblyTitle>
+    <AssemblyVersion>2.0.0.0</AssemblyVersion>
+    <ApplicationIcon>Assets\favicon.ico</ApplicationIcon>
+    <Company>Universal Excel Tool</Company>
+    <Product>Universal Excel Tool - Modern ETL Manager</Product>
+    <Description>Modern desktop application for Excel ETL operations with database integration</Description>
+    <Copyright>Copyright © 2025 Universal Excel Tool. All rights reserved.</Copyright>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.0.6" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.0.6" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.6" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.6" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="11.0.6" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.4" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="ClosedXML" Version="0.104.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Reference Core DLL directly to avoid self-contained conflicts -->
+    <!-- Using Debug build DLL from Core project -->
+    <Reference Include="UniversalExcelTool">
+      <HintPath>..\Core\bin\Debug\net8.0\win-x64\UniversalExcelTool.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <!-- Copy Core DLL and dependencies to output -->
+  <Target Name="CopyCoreDependencies" AfterTargets="Build">
+    <ItemGroup>
+      <CoreFiles Include="..\Core\bin\Debug\net8.0\win-x64\UniversalExcelTool.dll" />
+      <CoreFiles Include="..\Core\bin\Debug\net8.0\win-x64\UniversalExcelTool.pdb" />
+    </ItemGroup>
+    <Copy SourceFiles="@(CoreFiles)" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
+  </Target>
+
+</Project>

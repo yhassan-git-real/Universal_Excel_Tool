@@ -1,0 +1,27 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="using:UniversalExcelTool.UI.Converters"
+             x:Class="UniversalExcelTool.UI.App"
+             RequestedThemeVariant="Light">
+    <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+
+    <Application.Styles>
+        <FluentTheme />
+        <StyleInclude Source="/Styles/CustomStyles.axaml"/>
+    </Application.Styles>
+    
+    <Application.Resources>
+        <!-- Global Resources -->
+        <SolidColorBrush x:Key="PrimaryBrush" Color="#007991"/>
+        <SolidColorBrush x:Key="AccentBrush" Color="#78ffd6"/>
+        <SolidColorBrush x:Key="SuccessBrush" Color="#27AE60"/>
+        <SolidColorBrush x:Key="ErrorBrush" Color="#E74C3C"/>
+        <SolidColorBrush x:Key="WarningBrush" Color="#F39C12"/>
+        
+        <!-- Converters -->
+        <converters:BoolToNotificationColorConverter x:Key="BoolToNotificationColorConverter"/>
+        <converters:BoolToNotificationBorderConverter x:Key="BoolToNotificationBorderConverter"/>
+        <converters:BoolToNotificationTextConverter x:Key="BoolToNotificationTextConverter"/>
+        <converters:BoolToIconConverter x:Key="BoolToIconConverter"/>
+    </Application.Resources>
+</Application>

@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>ETL_DynamicTableManager</AssemblyName>
+    <RootNamespace>ETL_DynamicTableManager</RootNamespace>
+    <!-- Self-contained deployment settings -->
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PublishSingleFile>true</PublishSingleFile>
+    <PublishTrimmed>false</PublishTrimmed>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.4" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <!-- Copy appsettings.json from parent directory -->
+  <Target Name="CopyConfigFile" AfterTargets="Build">
+    <Copy SourceFiles="$(MSBuildProjectDirectory)\..\appsettings.json" 
+          DestinationFolder="$(OutputPath)" 
+          Condition="Exists('$(MSBuildProjectDirectory)\..\appsettings.json')" />
+  </Target>
+
+</Project>

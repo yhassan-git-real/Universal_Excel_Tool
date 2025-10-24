@@ -1,0 +1,312 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:UniversalExcelTool.UI.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="750"
+             x:Class="UniversalExcelTool.UI.Views.DashboardView"
+             x:DataType="vm:DashboardViewModel"
+             Background="#FAFBFC">
+
+    <Design.DataContext>
+        <vm:DashboardViewModel/>
+    </Design.DataContext>
+
+    <ScrollViewer>
+        <StackPanel Margin="28,20,28,28">
+
+            <!-- Status Cards with Enhanced Design -->
+            <Grid ColumnDefinitions="*,*,*" 
+                  Margin="0,0,0,28">
+                
+                <!-- Database Status Card -->
+                <Border Grid.Column="0" 
+                        Background="White"
+                        BorderBrush="#E5E7EB"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="20"
+                        BoxShadow="0 1 3 0 #0000001A"
+                        Margin="0,0,8,0">
+                    <StackPanel Spacing="14">
+                        <!-- Icon and Label -->
+                        <StackPanel Spacing="10">
+                            <Border Background="#EEF2FF" 
+                                    CornerRadius="6" 
+                                    Width="40" 
+                                    Height="40"
+                                    HorizontalAlignment="Left">
+                                <TextBlock Text="💾" 
+                                           FontSize="20" 
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel VerticalAlignment="Top" Spacing="2">
+                                <TextBlock Text="Database Status" 
+                                           FontSize="12" 
+                                           FontWeight="Medium"
+                                           Foreground="#6B7280"/>
+                                <TextBlock Text="{Binding DatabaseStatus}" 
+                                           FontSize="15"
+                                           FontWeight="SemiBold"
+                                           Foreground="#000000"
+                                           TextWrapping="Wrap"
+                                           TextTrimming="CharacterEllipsis"
+                                           MaxLines="1"/>
+                            </StackPanel>
+                        </StackPanel>
+                        
+                        <!-- Action Button -->
+                        <Button Command="{Binding CheckDatabaseConnectionCommand}"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Center"
+                                VerticalContentAlignment="Center"
+                                Height="36"
+                                Background="#007991"
+                                Foreground="White"
+                                BorderThickness="0"
+                                CornerRadius="6"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Padding="12,0"
+                                Cursor="Hand">
+                            <TextBlock Text="Check Connection"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                            <Button.Styles>
+                                <Style Selector="Button:pointerover">
+                                    <Setter Property="Background" Value="#78ffd6"/>
+                                </Style>
+                                <Style Selector="Button:pressed">
+                                    <Setter Property="Background" Value="#4dd0ba"/>
+                                </Style>
+                            </Button.Styles>
+                        </Button>
+                    </StackPanel>
+                </Border>
+
+                <!-- Quick Actions Card (Run ETL) -->
+                <Border Grid.Column="1" 
+                        Background="White"
+                        BorderBrush="#E5E7EB"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="20"
+                        BoxShadow="0 1 3 0 #0000001A"
+                        Margin="0,0,8,0">
+                    <StackPanel Spacing="14">
+                        <!-- Icon and Label -->
+                        <StackPanel Spacing="10">
+                            <Border Background="#DCFCE7" 
+                                    CornerRadius="6" 
+                                    Width="40" 
+                                    Height="40"
+                                    HorizontalAlignment="Left">
+                                <TextBlock Text="🚀" 
+                                           FontSize="20" 
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel VerticalAlignment="Top" Spacing="2">
+                                <TextBlock Text="Quick Actions" 
+                                           FontSize="12" 
+                                           FontWeight="Medium"
+                                           Foreground="#6B7280"/>
+                                <TextBlock Text="ETL Pipeline" 
+                                           FontSize="15"
+                                           FontWeight="SemiBold"
+                                           Foreground="#1A1A1A"
+                                           TextWrapping="Wrap"
+                                           TextTrimming="CharacterEllipsis"
+                                           MaxLines="1"/>
+                            </StackPanel>
+                        </StackPanel>
+                        
+                        <!-- Action Button -->
+                        <Button Command="{Binding RunCompleteETLCommand}"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Center"
+                                VerticalContentAlignment="Center"
+                                Height="36"
+                                Background="#10B981"
+                                Foreground="White"
+                                BorderThickness="0"
+                                CornerRadius="6"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Padding="12,0"
+                                Cursor="Hand">
+                            <TextBlock Text="Run Complete ETL"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                            <Button.Styles>
+                                <Style Selector="Button:pointerover">
+                                    <Setter Property="Background" Value="#059669"/>
+                                </Style>
+                                <Style Selector="Button:pressed">
+                                    <Setter Property="Background" Value="#047857"/>
+                                </Style>
+                            </Button.Styles>
+                        </Button>
+                    </StackPanel>
+                </Border>
+
+                <!-- Last Execution Card -->
+                <Border Grid.Column="2" 
+                        Background="White"
+                        BorderBrush="#E5E7EB"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="20"
+                        BoxShadow="0 1 3 0 #0000001A">
+                    <StackPanel Spacing="14">
+                        <!-- Icon and Label -->
+                        <StackPanel Spacing="10">
+                            <Border Background="#FEF3C7" 
+                                    CornerRadius="6" 
+                                    Width="40" 
+                                    Height="40"
+                                    HorizontalAlignment="Left">
+                                <TextBlock Text="⏱️" 
+                                           FontSize="20" 
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel VerticalAlignment="Top" Spacing="2">
+                                <TextBlock Text="Last Execution" 
+                                           FontSize="12" 
+                                           FontWeight="Medium"
+                                           Foreground="#6B7280"/>
+                                <TextBlock Text="{Binding LastExecutionInfo}" 
+                                           FontSize="13"
+                                           FontWeight="SemiBold"
+                                           Foreground="#1A1A1A"
+                                           TextWrapping="Wrap"
+                                           TextTrimming="CharacterEllipsis"
+                                           MaxLines="2"
+                                           LineHeight="18"/>
+                            </StackPanel>
+                        </StackPanel>
+                        
+                        <!-- Info Text -->
+                        <TextBlock Text="Last run timestamp will appear here"
+                                   FontSize="11"
+                                   Foreground="#9CA3AF"
+                                   TextWrapping="Wrap"
+                                   TextTrimming="CharacterEllipsis"
+                                   MaxLines="2"
+                                   LineHeight="16"/>
+                    </StackPanel>
+                </Border>
+
+            </Grid>
+
+            <!-- Live Log Viewer -->
+            <Border Background="White"
+                    BorderBrush="#E5E7EB"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="20"
+                    BoxShadow="0 1 3 0 #0000001A">
+                <StackPanel>
+                    <!-- Section Header with Clear Button -->
+                    <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,14">
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Live Log" 
+                                       FontSize="16" 
+                                       FontWeight="SemiBold"
+                                       Foreground="#1A1A1A"
+                                       Margin="0,0,0,2"/>
+                            <TextBlock Text="Real-time activity monitoring"
+                                       FontSize="12"
+                                       Foreground="#6B7280"/>
+                        </StackPanel>
+                        <Button Grid.Column="1" 
+                                Command="{Binding ClearLogsCommand}"
+                                HorizontalContentAlignment="Center"
+                                VerticalContentAlignment="Center"
+                                Height="32"
+                                MinWidth="90"
+                                Padding="16,0"
+                                Background="#F9FAFB"
+                                Foreground="#374151"
+                                BorderBrush="#E5E7EB"
+                                BorderThickness="1"
+                                CornerRadius="6"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Cursor="Hand">
+                            <TextBlock Text="Clear Logs"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                            <Button.Styles>
+                                <Style Selector="Button:pointerover">
+                                    <Setter Property="Background" Value="#F3F4F6"/>
+                                </Style>
+                            </Button.Styles>
+                        </Button>
+                    </Grid>
+
+                    <!-- Log Container -->
+                    <Border BorderBrush="#E5E7EB"
+                            BorderThickness="1"
+                            CornerRadius="6"
+                            Height="240"
+                            Background="#FAFBFC">
+                        <ScrollViewer Padding="10">
+                            <ItemsControl ItemsSource="{Binding LogEntries}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Padding="6,5"
+                                                Margin="0,1"
+                                                CornerRadius="4"
+                                                Background="Transparent">
+                                            <Border.Styles>
+                                                <Style Selector="Border:pointerover">
+                                                    <Setter Property="Background" Value="#F3F4F6"/>
+                                                </Style>
+                                            </Border.Styles>
+                                            <Grid ColumnDefinitions="Auto,Auto,*">
+                                                <!-- Icon -->
+                                                <TextBlock Grid.Column="0"
+                                                           Text="{Binding Icon}"
+                                                           FontSize="13"
+                                                           Margin="0,0,8,0"
+                                                           VerticalAlignment="Center"/>
+                                                
+                                                <!-- Timestamp -->
+                                                <Border Grid.Column="1"
+                                                        Background="#E5E7EB"
+                                                        CornerRadius="3"
+                                                        Padding="5,1"
+                                                        Margin="0,0,8,0">
+                                                    <TextBlock Text="{Binding Timestamp, StringFormat='HH:mm:ss'}"
+                                                               FontSize="10"
+                                                               FontFamily="Consolas"
+                                                               FontWeight="Medium"
+                                                               Foreground="#6B7280"/>
+                                                </Border>
+                                                
+                                                <!-- Message -->
+                                                <TextBlock Grid.Column="2"
+                                                           Text="{Binding Message}"
+                                                           FontSize="12"
+                                                           Foreground="#1A1A1A"
+                                                           TextWrapping="Wrap"
+                                                           VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+
+</UserControl>
+
+

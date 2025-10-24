@@ -1,0 +1,101 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:UniversalExcelTool.UI.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="400"
+        x:Class="UniversalExcelTool.UI.Views.AboutWindow"
+        x:DataType="vm:AboutViewModel"
+        Title="About"
+        Width="500" Height="400"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False">
+
+    <Design.DataContext>
+        <vm:AboutViewModel/>
+    </Design.DataContext>
+
+    <Border Padding="40">
+        <StackPanel Spacing="25" HorizontalAlignment="Center">
+            
+            <!-- Logo/Icon -->
+            <Border Width="100" Height="100" 
+                    Background="{DynamicResource SystemAccentColor}"
+                    CornerRadius="50"
+                    HorizontalAlignment="Center">
+                <TextBlock Text="📊" 
+                           FontSize="50"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"/>
+            </Border>
+
+            <!-- App Name -->
+            <TextBlock Text="Universal Excel Tool" 
+                       FontSize="28" 
+                       FontWeight="Bold"
+                       HorizontalAlignment="Center"/>
+
+            <!-- Subtitle -->
+            <TextBlock Text="Modern ETL Manager" 
+                       FontSize="16"
+                       Foreground="{DynamicResource SystemBaseMediumColor}"
+                       HorizontalAlignment="Center"/>
+
+            <!-- Version Info -->
+            <StackPanel Spacing="10" HorizontalAlignment="Center">
+                <TextBlock HorizontalAlignment="Center">
+                    <Run Text="Version " Foreground="{DynamicResource SystemBaseMediumColor}"/>
+                    <Run Text="{Binding Version}" FontWeight="SemiBold"/>
+                </TextBlock>
+                
+                <TextBlock HorizontalAlignment="Center">
+                    <Run Text="Build Date: " Foreground="{DynamicResource SystemBaseMediumColor}"/>
+                    <Run Text="{Binding BuildDate}"/>
+                </TextBlock>
+            </StackPanel>
+
+            <!-- Description -->
+            <TextBlock Text="{Binding Description}"
+                       TextWrapping="Wrap"
+                       TextAlignment="Center"
+                       Foreground="{DynamicResource SystemBaseMediumColor}"
+                       MaxWidth="400"/>
+
+            <!-- Features -->
+            <Border Classes="card" Padding="20" MaxWidth="400">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="✨ Features" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                    <TextBlock Text="• Modern Avalonia UI with MVVM architecture"/>
+                    <TextBlock Text="• Real-time ETL progress tracking"/>
+                    <TextBlock Text="• Live log viewer with color coding"/>
+                    <TextBlock Text="• Database connection testing"/>
+                    <TextBlock Text="• Dynamic table configuration"/>
+                    <TextBlock Text="• Modular ETL pipeline execution"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Technology Stack -->
+            <StackPanel Spacing="5" HorizontalAlignment="Center">
+                <TextBlock Text="Built with:" 
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource SystemBaseMediumColor}"/>
+                <TextBlock Text=".NET 8.0 • Avalonia UI 11.0 • CommunityToolkit.Mvvm"
+                           FontSize="12"
+                           Foreground="{DynamicResource SystemBaseMediumColor}"
+                           HorizontalAlignment="Center"/>
+            </StackPanel>
+
+            <!-- Close Button -->
+            <Button Content="Close" 
+                    Classes="primary"
+                    Click="CloseButton_Click"
+                    HorizontalAlignment="Center"
+                    MinWidth="120"
+                    Margin="0,10,0,0"/>
+
+        </StackPanel>
+    </Border>
+
+</Window>
+
+

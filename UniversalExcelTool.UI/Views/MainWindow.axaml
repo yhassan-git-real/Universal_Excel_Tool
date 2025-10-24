@@ -1,0 +1,629 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:UniversalExcelTool.UI.ViewModels"
+        xmlns:views="using:UniversalExcelTool.UI.Views"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="700"
+        x:Class="UniversalExcelTool.UI.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="{Binding Title}"
+        Width="1200" Height="700"
+        MinWidth="900" MinHeight="600"
+        WindowStartupLocation="CenterScreen">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Window.DataTemplates>
+        <!-- DataTemplates to map ViewModels to Views -->
+        <DataTemplate DataType="{x:Type vm:DashboardViewModel}">
+            <views:DashboardView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:DynamicTableConfigViewModel}">
+            <views:DynamicTableConfigView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ExcelProcessorViewModel}">
+            <views:ExcelProcessorView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:DatabaseLoaderViewModel}">
+            <views:DatabaseLoaderView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
+            <views:SettingsView/>
+        </DataTemplate>
+    </Window.DataTemplates>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="220"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Menu Bar -->
+        <Border Grid.Row="0" 
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Background="#F9FAFB"
+                BorderThickness="0,0,0,1"
+                BorderBrush="#E5E7EB"
+                Height="32">
+            <Menu Background="Transparent" Height="32">
+                <Menu.Styles>
+                    <Style Selector="MenuItem">
+                        <Setter Property="FontSize" Value="12"/>
+                        <Setter Property="Padding" Value="12,6"/>
+                        <Setter Property="Margin" Value="2,0"/>
+                    </Style>
+                    <Style Selector="MenuItem:selected /template/ ContentPresenter">
+                        <Setter Property="Background" Value="#E5E7EB"/>
+                    </Style>
+                    <Style Selector="MenuItem:pointerover /template/ ContentPresenter">
+                        <Setter Property="Background" Value="#E5E7EB"/>
+                    </Style>
+                </Menu.Styles>
+                
+                <!-- File Menu -->
+                <MenuItem Header="_File" Padding="12,0,12,0" Height="32">
+                    <MenuItem Header="_New Configuration" InputGesture="Ctrl+N">
+                        <MenuItem.Icon>
+                            <TextBlock Text="📄" FontSize="14"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="_Open Configuration..." InputGesture="Ctrl+O">
+                        <MenuItem.Icon>
+                            <TextBlock Text="📂" FontSize="14"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="_Save Configuration" InputGesture="Ctrl+S">
+                        <MenuItem.Icon>
+                            <TextBlock Text="💾" FontSize="14"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <Separator/>
+                    <MenuItem Header="_Export Logs..." InputGesture="Ctrl+E">
+                        <MenuItem.Icon>
+                            <TextBlock Text="📤" FontSize="14"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <Separator/>
+                    <MenuItem Header="E_xit" InputGesture="Alt+F4">
+                        <MenuItem.Icon>
+                            <TextBlock Text="🚪" FontSize="14"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </MenuItem>
+
+                <!-- Edit Menu -->
+                <MenuItem Header="_Edit" Padding="12,0,12,0" Height="32">
+                    <MenuItem Header="_Undo" InputGesture="Ctrl+Z">
+                        <MenuItem.Icon>
+                            <TextBlock Text="↶" FontSize="14"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="_Redo" InputGesture="Ctrl+Y">
+                        <MenuItem.Icon>
+                            <TextBlock Text="↷" FontSize="14"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <Separator/>
+                    <MenuItem Header="Cu_t" InputGesture="Ctrl+X">
+                        <MenuItem.Icon>
+                            <TextBlock Text="✂️" FontSize="14"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="_Copy" InputGesture="Ctrl+C">
+                        <MenuItem.Icon>
+                            <TextBlock Text="📋" FontSize="14"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="_Paste" InputGesture="Ctrl+V">
+                        <MenuItem.Icon>
+                            <TextBlock Text="📄" FontSize="14"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <Separator/>
+                    <MenuItem Header="_Preferences..." InputGesture="Ctrl+,">
+                        <MenuItem.Icon>
+                            <TextBlock Text="⚙️" FontSize="14"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </MenuItem>
+
+                <!-- View Menu -->
+                <MenuItem Header="_View" Padding="12,0,12,0" Height="32">
+                    <MenuItem Header="_Dashboard" InputGesture="Ctrl+1" Command="{Binding NavigateToDashboardCommand}">
+                        <MenuItem.Icon>
+                            <TextBlock Text="📊" FontSize="14"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="_Table Configuration" InputGesture="Ctrl+2" Command="{Binding NavigateToTableConfigCommand}">
+                        <MenuItem.Icon>
+                            <TextBlock Text="🔧" FontSize="14"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="_Excel Processor" InputGesture="Ctrl+3" Command="{Binding NavigateToExcelProcessorCommand}">
+                        <MenuItem.Icon>
+                            <TextBlock Text="📄" FontSize="14"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="_Database Loader" InputGesture="Ctrl+4" Command="{Binding NavigateToDatabaseLoaderCommand}">
+                        <MenuItem.Icon>
+                            <TextBlock Text="🗄️" FontSize="14"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <Separator/>
+                    <MenuItem Header="_Settings" InputGesture="Ctrl+S" Command="{Binding NavigateToSettingsCommand}">
+                        <MenuItem.Icon>
+                            <TextBlock Text="⚙️" FontSize="14"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <Separator/>
+                    <MenuItem Header="_Refresh" InputGesture="F5">
+                        <MenuItem.Icon>
+                            <TextBlock Text="🔄" FontSize="14"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </MenuItem>
+
+                <!-- Help Menu -->
+                <MenuItem Header="_Help" Padding="12,0,12,0" Height="32">
+                    <MenuItem Header="_Documentation" InputGesture="F1">
+                        <MenuItem.Icon>
+                            <TextBlock Text="📖" FontSize="14"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="_Quick Start Guide">
+                        <MenuItem.Icon>
+                            <TextBlock Text="🚀" FontSize="14"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <Separator/>
+                    <MenuItem Header="_Check for Updates">
+                        <MenuItem.Icon>
+                            <TextBlock Text="🔄" FontSize="14"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <Separator/>
+                    <MenuItem Header="_About Universal Excel Tool" Command="{Binding ShowAboutCommand}">
+                        <MenuItem.Icon>
+                            <TextBlock Text="ℹ️" FontSize="14"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </MenuItem>
+            </Menu>
+        </Border>
+
+        <!-- Header Bar -->
+        <Border Grid.Row="1" 
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Background="White"
+                BorderThickness="0,0,0,1"
+                BorderBrush="#E5E7EB"
+                Height="60">
+            <Grid ColumnDefinitions="220,*" Margin="0">
+                <!-- Logo Section in Header -->
+                <Border Grid.Column="0" 
+                        Background="#007991"
+                        BorderThickness="0,0,1,0"
+                        BorderBrush="#E5E7EB">
+                    <StackPanel Orientation="Horizontal" 
+                               Spacing="12" 
+                               Margin="20,0"
+                               VerticalAlignment="Center">
+                        <Border Background="#78ffd6"
+                                CornerRadius="8"
+                                Width="36"
+                                Height="36">
+                            <TextBlock Text="📊" 
+                                       FontSize="20" 
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="Universal Excel Tool" 
+                                       FontSize="13" 
+                                       FontWeight="Bold"
+                                       Foreground="White"/>
+                            <TextBlock Text="Modern ETL Manager" 
+                                       FontSize="9" 
+                                       Foreground="#9BA3AE"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Page Title Section -->
+                <Grid Grid.Column="1" Margin="28,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Breadcrumb and Title -->
+                    <StackPanel Grid.Column="0" 
+                               VerticalAlignment="Center"
+                               Spacing="4">
+                        <!-- Breadcrumb -->
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="🏠" FontSize="11" Foreground="#000000" VerticalAlignment="Center"/>
+                            <TextBlock Text="/" FontSize="11" Foreground="#000000" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding CurrentPageTitle}" 
+                                       FontSize="11" 
+                                       Foreground="#000000"
+                                       FontWeight="Medium"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <!-- Page Title -->
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock Text="{Binding CurrentPageIcon}" 
+                                       FontSize="18" 
+                                       VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding CurrentPageTitle}" 
+                                       FontSize="18" 
+                                       FontWeight="Bold"
+                                       Foreground="#1A1A1A"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Header Actions -->
+                    <StackPanel Grid.Column="1" 
+                               Orientation="Horizontal" 
+                               Spacing="12"
+                               VerticalAlignment="Center">
+                        <!-- System Time -->
+                        <Border Background="#F9FAFB"
+                                BorderBrush="#E5E7EB"
+                                BorderThickness="1"
+                                CornerRadius="6"
+                                Padding="10,6">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock Text="🕐" FontSize="12" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding CurrentTime, StringFormat='HH:mm:ss'}" 
+                                           FontSize="11"
+                                           FontFamily="Consolas"
+                                           FontWeight="Medium"
+                                           Foreground="#6B7280"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                        <!-- User Info -->
+                        <Border Background="#EEF2FF"
+                                BorderBrush="#C7D2FE"
+                                BorderThickness="1"
+                                CornerRadius="6"
+                                Padding="10,6">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock Text="👤" FontSize="12" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding UserName}" 
+                                           FontSize="11"
+                                           FontWeight="Medium"
+                                           Foreground="#4F46E5"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <!-- Navigation Sidebar -->
+        <Border Grid.Row="2"
+                Grid.Column="0" 
+                Background="#007991"
+                BorderThickness="0,0,1,0"
+                BorderBrush="#006577">
+            <StackPanel Margin="0,16">
+
+                <!-- Navigation Buttons -->
+                <StackPanel Margin="12,0">
+                    <Button Command="{Binding NavigateToDashboardCommand}"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Left"
+                            Padding="0"
+                            Margin="0,2"
+                            Background="Transparent"
+                            Foreground="White"
+                            BorderThickness="0"
+                            CornerRadius="6"
+                            Height="38"
+                            Cursor="Hand">
+                        <Grid ColumnDefinitions="Auto,*" Margin="12,0">
+                            <TextBlock Grid.Column="0" 
+                                       Text="📊" 
+                                       FontSize="16" 
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,10,0"/>
+                            <TextBlock Grid.Column="1" 
+                                       Text="Dashboard" 
+                                       FontSize="13"
+                                       FontWeight="Medium"
+                                       VerticalAlignment="Center"/>
+                        </Grid>
+                        <Button.Styles>
+                            <Style Selector="Button:pointerover">
+                                <Setter Property="Background" Value="#78ffd6"/>
+                            </Style>
+                            <Style Selector="Button:pressed">
+                                <Setter Property="Background" Value="#4dd0ba"/>
+                            </Style>
+                        </Button.Styles>
+                    </Button>
+
+                    <Button Command="{Binding NavigateToTableConfigCommand}"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Left"
+                            Padding="0"
+                            Margin="0,2"
+                            Background="Transparent"
+                            Foreground="White"
+                            BorderThickness="0"
+                            CornerRadius="6"
+                            Height="38"
+                            Cursor="Hand">
+                        <Grid ColumnDefinitions="Auto,*" Margin="12,0">
+                            <TextBlock Grid.Column="0" 
+                                       Text="🔧" 
+                                       FontSize="16" 
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,10,0"/>
+                            <TextBlock Grid.Column="1" 
+                                       Text="Table Configuration" 
+                                       FontSize="13"
+                                       FontWeight="Medium"
+                                       VerticalAlignment="Center"/>
+                        </Grid>
+                        <Button.Styles>
+                            <Style Selector="Button:pointerover">
+                                <Setter Property="Background" Value="#78ffd6"/>
+                            </Style>
+                            <Style Selector="Button:pressed">
+                                <Setter Property="Background" Value="#4dd0ba"/>
+                            </Style>
+                        </Button.Styles>
+                    </Button>
+
+                    <Button Command="{Binding NavigateToExcelProcessorCommand}"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Left"
+                            Padding="0"
+                            Margin="0,2"
+                            Background="Transparent"
+                            Foreground="White"
+                            BorderThickness="0"
+                            CornerRadius="6"
+                            Height="38"
+                            Cursor="Hand">
+                        <Grid ColumnDefinitions="Auto,*" Margin="12,0">
+                            <TextBlock Grid.Column="0" 
+                                       Text="📄" 
+                                       FontSize="16" 
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,10,0"/>
+                            <TextBlock Grid.Column="1" 
+                                       Text="Excel Processor" 
+                                       FontSize="13"
+                                       FontWeight="Medium"
+                                       VerticalAlignment="Center"/>
+                        </Grid>
+                        <Button.Styles>
+                            <Style Selector="Button:pointerover">
+                                <Setter Property="Background" Value="#78ffd6"/>
+                            </Style>
+                            <Style Selector="Button:pressed">
+                                <Setter Property="Background" Value="#4dd0ba"/>
+                            </Style>
+                        </Button.Styles>
+                    </Button>
+
+                    <Button Command="{Binding NavigateToDatabaseLoaderCommand}"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Left"
+                            Padding="0"
+                            Margin="0,2"
+                            Background="Transparent"
+                            Foreground="White"
+                            BorderThickness="0"
+                            CornerRadius="6"
+                            Height="38"
+                            Cursor="Hand">
+                        <Grid ColumnDefinitions="Auto,*" Margin="12,0">
+                            <TextBlock Grid.Column="0" 
+                                       Text="🗄️" 
+                                       FontSize="16" 
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,10,0"/>
+                            <TextBlock Grid.Column="1" 
+                                       Text="Database Loader" 
+                                       FontSize="13"
+                                       FontWeight="Medium"
+                                       VerticalAlignment="Center"/>
+                        </Grid>
+                        <Button.Styles>
+                            <Style Selector="Button:pointerover">
+                                <Setter Property="Background" Value="#78ffd6"/>
+                            </Style>
+                            <Style Selector="Button:pressed">
+                                <Setter Property="Background" Value="#4dd0ba"/>
+                            </Style>
+                        </Button.Styles>
+                    </Button>
+                </StackPanel>
+
+                <Separator Margin="12,16" Background="#006577" Height="1"/>
+
+                <StackPanel Margin="12,0">
+                    <Button Command="{Binding NavigateToSettingsCommand}"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Left"
+                            Padding="0"
+                            Margin="0,2"
+                            Background="Transparent"
+                            Foreground="White"
+                            BorderThickness="0"
+                            CornerRadius="6"
+                            Height="38"
+                            Cursor="Hand">
+                        <Grid ColumnDefinitions="Auto,*" Margin="12,0">
+                            <TextBlock Grid.Column="0" 
+                                       Text="⚙️" 
+                                       FontSize="16" 
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,10,0"/>
+                            <TextBlock Grid.Column="1" 
+                                       Text="Settings" 
+                                       FontSize="13"
+                                       FontWeight="Medium"
+                                       VerticalAlignment="Center"/>
+                        </Grid>
+                        <Button.Styles>
+                            <Style Selector="Button:pointerover">
+                                <Setter Property="Background" Value="#78ffd6"/>
+                            </Style>
+                            <Style Selector="Button:pressed">
+                                <Setter Property="Background" Value="#4dd0ba"/>
+                            </Style>
+                        </Button.Styles>
+                    </Button>
+
+                    <Button Command="{Binding ShowAboutCommand}"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Left"
+                            Padding="0"
+                            Margin="0,2"
+                            Background="Transparent"
+                            Foreground="White"
+                            BorderThickness="0"
+                            CornerRadius="6"
+                            Height="38"
+                            Cursor="Hand">
+                        <Grid ColumnDefinitions="Auto,*" Margin="12,0">
+                            <TextBlock Grid.Column="0" 
+                                       Text="ℹ️" 
+                                       FontSize="16" 
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,10,0"/>
+                            <TextBlock Grid.Column="1" 
+                                       Text="About" 
+                                       FontSize="13"
+                                       FontWeight="Medium"
+                                       VerticalAlignment="Center"/>
+                        </Grid>
+                        <Button.Styles>
+                            <Style Selector="Button:pointerover">
+                                <Setter Property="Background" Value="#78ffd6"/>
+                            </Style>
+                            <Style Selector="Button:pressed">
+                                <Setter Property="Background" Value="#4dd0ba"/>
+                            </Style>
+                        </Button.Styles>
+                    </Button>
+                </StackPanel>
+
+            </StackPanel>
+        </Border>
+
+        <!-- Content Area -->
+        <Border Grid.Row="2"
+                Grid.Column="1" 
+                Background="#FAFBFC">
+            <ContentControl Content="{Binding CurrentViewModel}" 
+                          Margin="0"/>
+        </Border>
+
+        <!-- Footer Bar -->
+        <Border Grid.Row="3" 
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Background="#F9FAFB"
+                BorderThickness="0,1,0,0"
+                BorderBrush="#E5E7EB"
+                Height="36">
+            <Grid ColumnDefinitions="220,*" Margin="0">
+                <!-- Footer Left (Sidebar area) -->
+                <Border Grid.Column="0" 
+                        Background="#006577"
+                        BorderThickness="0,0,1,0"
+                        BorderBrush="#E5E7EB">
+                    <StackPanel Orientation="Horizontal" 
+                               Spacing="8" 
+                               Margin="20,0"
+                               VerticalAlignment="Center">
+                        <TextBlock Text="v2.0.0" 
+                                   FontSize="10" 
+                                   Foreground="#9BA3AE"
+                                   VerticalAlignment="Center"/>
+                        <TextBlock Text="|" 
+                                   FontSize="10" 
+                                   Foreground="#6B7280"
+                                   VerticalAlignment="Center"/>
+                        <TextBlock Text=".NET 8.0" 
+                                   FontSize="10" 
+                                   Foreground="#9BA3AE"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Footer Right (Main content area) -->
+                <Grid Grid.Column="1" Margin="28,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Status Information -->
+                    <StackPanel Grid.Column="0" 
+                               Orientation="Horizontal" 
+                               Spacing="16"
+                               VerticalAlignment="Center">
+                        <!-- Copyright -->
+                        <TextBlock Text="© 2025 Universal Excel Tool. All rights reserved." 
+                                   FontSize="10" 
+                                   Foreground="#6B7280"
+                                   VerticalAlignment="Center"/>
+                        <TextBlock Text="|" 
+                                   FontSize="10" 
+                                   Foreground="#D1D5DB"
+                                   VerticalAlignment="Center"/>
+                        <!-- Status Badge -->
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <Ellipse Width="8" 
+                                    Height="8" 
+                                    Fill="#10B981"
+                                    VerticalAlignment="Center"/>
+                            <TextBlock Text="System Ready" 
+                                       FontSize="10" 
+                                       Foreground="#10B981"
+                                       FontWeight="Medium"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- System Info -->
+                    <StackPanel Grid.Column="1" 
+                               Orientation="Horizontal" 
+                               Spacing="12"
+                               VerticalAlignment="Center">
+                        <TextBlock Text="{Binding CurrentPageDescription}" 
+                                   FontSize="10" 
+                                   Foreground="#9CA3AF"
+                                   FontStyle="Italic"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </Border>
+
+    </Grid>
+
+</Window>
+
+

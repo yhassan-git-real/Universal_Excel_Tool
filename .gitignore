@@ -1,0 +1,237 @@
+# Universal Excel Tool - Git Ignore File
+# Created: October 24, 2025
+
+#######################
+# .NET Build Outputs
+#######################
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa]rm/
+[Aa]rm64/
+bld/
+[Bb]uild/
+*.dll
+*.exe
+!build_and_run.bat
+!build_self_contained.bat
+!start_unified_etl.bat
+!ETL_*.bat
+
+# .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+**/Properties/launchSettings.json
+
+# NuGet
+*.nupkg
+*.snupkg
+**/packages/*
+!**/packages/build/
+*.nuget.props
+*.nuget.targets
+project.assets.json
+
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# ReSharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# Rider
+.idea/
+*.sln.iml
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+#######################
+# Application Logs
+#######################
+Logs/
+*.log
+*.txt
+!README*.txt
+!DEPLOYMENT_README.md
+
+#######################
+# Application Data
+#######################
+# Excel files (input/output)
+**/RawExcelFiles/**/*.xlsx
+**/RawExcelFiles/**/*.xls
+**/ExcelFiles/**/*.xlsx
+**/ExcelFiles/**/*.xls
+**/ProcessedFiles/**/*.xlsx
+**/ProcessedFiles/**/*.xls
+**/Special_Sheets_Excels/**/*.xlsx
+**/Special_Sheets_Excels/**/*.xls
+
+# Keep directory structure
+!**/RawExcelFiles/.gitkeep
+!**/ExcelFiles/.gitkeep
+!**/ProcessedFiles/.gitkeep
+!**/Special_Sheets_Excels/.gitkeep
+
+# Temporary files
+**/TempFiles/**/*
+!**/TempFiles/.gitkeep
+
+#######################
+# Configuration Files
+#######################
+# Keep template/example configs, ignore runtime configs
+appsettings.Development.json
+appsettings.Production.json
+dynamic_table_config.json
+dynamic_table_config_backup.json
+
+# Keep the base config as template
+!appsettings.json
+
+#######################
+# Database Files
+#######################
+*.mdf
+*.ldf
+*.sqlite
+*.db
+
+#######################
+# OS Files
+#######################
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux
+*~
+.directory
+
+#######################
+# Development Tools
+#######################
+# Backup files
+*.backup
+*.bak
+*.tmp
+*.temp
+*~
+
+# Profiler results
+*.psess
+*.vsp
+*.vspx
+*.sap
+
+# Test Coverage
+*.coverage
+*.coveragexml
+
+# NCrunch
+_NCrunch_*
+.*crunch*.local.xml
+nCrunchTemp_*
+
+# Benchmark Results
+BenchmarkDotNet.Artifacts/
+
+#######################
+# Build Scripts Output
+#######################
+publish/
+dist/
+out/
+
+#######################
+# JetBrains Rider
+#######################
+.idea/
+*.sln.iml
+.idea_modules/
+
+#######################
+# Node.js (if used for UI)
+#######################
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+#######################
+# Python (if used for scripts)
+#######################
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+
+#######################
+# Archives
+#######################
+*.zip
+*.7z
+*.rar
+*.tar
+*.tar.gz
+
+#######################
+# Sensitive Information
+#######################
+# Connection strings with passwords
+*connectionstrings.json
+*secrets.json
+*.pfx
+*.p12
+*.key
+*.pem
+
+#######################
+# Custom Application Specific
+#######################
+# Deployment artifacts
+deployment/
+release/
+releases/
+
+# Documentation generated files
+docs/generated/
+api-docs/
+
+# Keep important documentation
+!README.md
+!DEPLOYMENT_README.md
+!LICENSE
+!CHANGELOG.md

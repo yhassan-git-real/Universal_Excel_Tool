@@ -1,0 +1,69 @@
+# Set default behavior to automatically normalize line endings
+* text=auto
+
+# Source code files
+*.cs text diff=csharp
+*.csproj text diff=xml
+*.sln text eol=crlf
+*.json text
+*.xml text
+*.config text
+*.yml text
+*.yaml text
+
+# Scripts
+*.sh text eol=lf
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Documentation
+*.md text
+*.txt text
+README* text
+
+# Binary files
+*.dll binary
+*.exe binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.7z binary
+
+# Excel files (always treat as binary)
+*.xlsx binary
+*.xls binary
+*.xlsm binary
+
+# Database files
+*.mdf binary
+*.ldf binary
+*.sqlite binary
+*.db binary
+
+# Font files
+*.ttf binary
+*.otf binary
+*.woff binary
+*.woff2 binary
+*.eot binary
+
+# Archives
+*.tar binary
+*.gz binary
+*.bz2 binary
+
+# Compiled files
+*.o binary
+*.so binary
+*.a binary
+*.lib binary
+*.dylib binary
+
+# Prevent merge conflicts in generated files
+*.designer.cs merge=binary
+*AssemblyInfo.cs merge=binary

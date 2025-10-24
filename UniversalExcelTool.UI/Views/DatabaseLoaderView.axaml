@@ -1,0 +1,232 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:UniversalExcelTool.UI.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="950" d:DesignHeight="700"
+             x:Class="UniversalExcelTool.UI.Views.DatabaseLoaderView"
+             x:DataType="vm:DatabaseLoaderViewModel">
+
+    <Design.DataContext>
+        <vm:DatabaseLoaderViewModel/>
+    </Design.DataContext>
+
+    <ScrollViewer>
+        <StackPanel Margin="28,20,28,28">
+
+            <!-- Action Card -->
+            <Border Background="White"
+                    BorderBrush="#E5E7EB"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="20"
+                    BoxShadow="0 1 3 0 #0000001A"
+                    Margin="0,0,0,16">
+                <StackPanel Spacing="14">
+                    <!-- Module Header -->
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <Border Background="#DCFCE7"
+                                CornerRadius="6"
+                                Width="40"
+                                Height="40"
+                                VerticalAlignment="Top">
+                            <TextBlock Text="💾" 
+                                       FontSize="20" 
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="Database Loading Module" 
+                                       FontSize="16" 
+                                       FontWeight="SemiBold"
+                                       Foreground="#1A1A1A"/>
+                            <TextBlock Text="This module loads processed data from CSV/Excel files into SQL Server tables with bulk insert operations for optimal performance."
+                                       FontSize="12"
+                                       Foreground="#6B7280"
+                                       TextWrapping="Wrap"
+                                       Margin="0,3,0,0"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Action Button -->
+                    <Button Command="{Binding RunDatabaseLoaderCommand}"
+                            IsEnabled="{Binding !IsBusy}"
+                            HorizontalAlignment="Left"
+                            Height="36"
+                            Padding="20,0"
+                            Background="#10B981"
+                            Foreground="White"
+                            BorderThickness="0"
+                            CornerRadius="6"
+                            FontSize="13"
+                            FontWeight="Medium"
+                            Margin="0,6,0,0"
+                            Cursor="Hand">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="▶" FontSize="11" VerticalAlignment="Center"/>
+                            <TextBlock Text="Run Database Loader" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <Button.Styles>
+                            <Style Selector="Button:pointerover /template/ ContentPresenter">
+                                <Setter Property="Background" Value="#059669"/>
+                            </Style>
+                            <Style Selector="Button:pressed /template/ ContentPresenter">
+                                <Setter Property="Background" Value="#047857"/>
+                            </Style>
+                        </Button.Styles>
+                    </Button>
+                </StackPanel>
+            </Border>
+
+            <!-- Progress Section -->
+            <Border Background="White"
+                    BorderBrush="#E5E7EB"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="20"
+                    BoxShadow="0 1 3 0 #0000001A"
+                    Margin="0,0,0,16"
+                    IsVisible="{Binding ProgressInfo.OverallProgress}">
+                <StackPanel Spacing="12">
+                    <!-- Progress Header -->
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="⏳" FontSize="16" VerticalAlignment="Center"/>
+                        <TextBlock Text="Loading Progress" 
+                                   FontSize="15" 
+                                   FontWeight="SemiBold"
+                                   Foreground="#1A1A1A"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+                    
+                    <!-- Progress Bar -->
+                    <ProgressBar Value="{Binding ProgressInfo.OverallProgress}" 
+                                 Maximum="100"
+                                 Height="6"
+                                 CornerRadius="3"
+                                 Foreground="#10B981"
+                                 Background="#E5E7EB"/>
+                    
+                    <!-- Status Info -->
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Text="{Binding ProgressInfo.Status}" 
+                                   FontSize="12"
+                                   Foreground="#6B7280"/>
+                        <TextBlock Grid.Column="1"
+                                   Text="{Binding ProgressInfo.OverallProgress, StringFormat='{}{0:F1}%'}"
+                                   FontSize="13"
+                                   FontWeight="SemiBold"
+                                   Foreground="#10B981"/>
+                    </Grid>
+
+                    <!-- Row Count Info -->
+                    <Border IsVisible="{Binding ProgressInfo.TotalRows}"
+                            Background="#F3F4F6"
+                            BorderBrush="#D1D5DB"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Padding="10,6">
+                        <Grid ColumnDefinitions="Auto,*">
+                            <TextBlock Text="Rows Processed: " 
+                                       FontSize="11"
+                                       Foreground="#6B7280"
+                                       VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1"
+                                       Text="{Binding ProgressInfo.CurrentRow, StringFormat='{}{0:N0}'}"
+                                       FontSize="11"
+                                       FontWeight="SemiBold"
+                                       Foreground="#374151"
+                                       VerticalAlignment="Center"/>
+                        </Grid>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <!-- Live Log Viewer -->
+            <Border Background="White"
+                    BorderBrush="#E5E7EB"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="20"
+                    BoxShadow="0 1 3 0 #0000001A">
+                <StackPanel>
+                    <!-- Log Header -->
+                    <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,12">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="📜" FontSize="16" VerticalAlignment="Center"/>
+                            <TextBlock Text="Live Logs" 
+                                       FontSize="16" 
+                                       FontWeight="SemiBold"
+                                       Foreground="#1A1A1A"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <Border Grid.Column="1"
+                                Background="#F3F4F6"
+                                BorderBrush="#D1D5DB"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Padding="8,4">
+                            <TextBlock Text="{Binding LogEntries.Count, StringFormat='({0} entries)'}"
+                                       FontSize="11"
+                                       FontWeight="Medium"
+                                       Foreground="#6B7280"/>
+                        </Border>
+                    </Grid>
+
+                    <!-- Log Container -->
+                    <Border BorderBrush="#E5E7EB"
+                            BorderThickness="1"
+                            CornerRadius="6"
+                            Height="240"
+                            Background="#FAFBFC">
+                        <ScrollViewer Padding="10">
+                            <ItemsControl ItemsSource="{Binding LogEntries}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Padding="6,4"
+                                                Margin="0,1"
+                                                CornerRadius="4"
+                                                Background="Transparent">
+                                            <Border.Styles>
+                                                <Style Selector="Border:pointerover">
+                                                    <Setter Property="Background" Value="#F3F4F6"/>
+                                                </Style>
+                                            </Border.Styles>
+                                            <Grid ColumnDefinitions="Auto,Auto,*">
+                                                <TextBlock Grid.Column="0"
+                                                           Text="{Binding Icon}"
+                                                           FontSize="12"
+                                                           Margin="0,0,8,0"
+                                                           VerticalAlignment="Center"/>
+                                                <Border Grid.Column="1"
+                                                        Background="#E5E7EB"
+                                                        CornerRadius="3"
+                                                        Padding="5,1"
+                                                        Margin="0,0,8,0">
+                                                    <TextBlock Text="{Binding Timestamp, StringFormat='HH:mm:ss'}"
+                                                               FontSize="10"
+                                                               FontFamily="Consolas"
+                                                               FontWeight="Medium"
+                                                               Foreground="#6B7280"/>
+                                                </Border>
+                                                <TextBlock Grid.Column="2"
+                                                           Text="{Binding Message}"
+                                                           FontSize="12"
+                                                           Foreground="#1A1A1A"
+                                                           TextWrapping="Wrap"
+                                                           VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+
+</UserControl>
+
+
