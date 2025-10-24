@@ -18,7 +18,7 @@ namespace UniversalExcelTool.Core
         public ETLOrchestrator()
         {
             _configManager = UnifiedConfigurationManager.Instance;
-            _logFilePath = Path.Combine(_configManager.GetLogsPath(), $"ETL_Orchestrator_{DateTime.Now:yyyyMMdd_HHmmss}.txt");
+            _logFilePath = Path.Combine(_configManager.GetLogFilesPath(), $"ETL_Orchestrator_{DateTime.Now:yyyyMMdd_HHmmss}.txt");
         }
 
         /// <summary>

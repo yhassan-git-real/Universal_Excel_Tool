@@ -44,11 +44,11 @@ namespace UniversalExcelTool.Core
     /// </summary>
     public class PathsConfig
     {
-        public string RawExcelFiles { get; set; } = string.Empty;
-        public string ExcelFiles { get; set; } = string.Empty;
-        public string ProcessedFiles { get; set; } = string.Empty;
-        public string Logs { get; set; } = string.Empty;
-        public string TempFiles { get; set; } = string.Empty;
+        public string InputExcelFiles { get; set; } = string.Empty;      // Input: Raw Excel files to process
+        public string OutputExcelFiles { get; set; } = string.Empty;     // Output: Regular processed Excel files
+        public string SpecialExcelFiles { get; set; } = string.Empty;    // Output: Special categorized Excel files (SUP, DEM)
+        public string LogFiles { get; set; } = string.Empty;             // Logs: Application logs and audit trails
+        public string TempFiles { get; set; } = string.Empty;            // Temp: Temporary processing files
     }
 
     /// <summary>

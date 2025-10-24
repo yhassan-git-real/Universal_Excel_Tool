@@ -37,7 +37,7 @@ namespace ETL_ExcelToDatabase.Core
                 },
                 ProcessConfig = new ProcessConfig
                 {
-                    ExcelFolderPath = _unifiedConfig.GetExcelFilesPath(),
+                    ExcelFolderPath = _unifiedConfig.GetOutputExcelFilesPath(),
                     TempTableName = "", // Dynamic - will be loaded from dynamic config
                     DestinationTableName = "", // Dynamic - will be loaded from dynamic config
                     ErrorTableName = unifiedConfig.Tables.ErrorTableName,
@@ -45,7 +45,7 @@ namespace ETL_ExcelToDatabase.Core
                     BatchSize = unifiedConfig.Processing.BatchSize,
                     ValidateColumnMapping = unifiedConfig.Processing.ValidateColumnMapping,
                     DefaultSheetName = unifiedConfig.Processing.DefaultSheetName,
-                    LogFolderPath = _unifiedConfig.GetLogsPath()
+                    LogFolderPath = _unifiedConfig.GetLogFilesPath()
                 }
             };
         }

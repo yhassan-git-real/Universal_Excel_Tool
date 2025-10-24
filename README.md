@@ -301,10 +301,11 @@ docker run -v /data:/app/data universal-excel-tool
     "ConnectionTimeout": 600      // 10 minutes
   },
   "Paths": {
-    "RawExcelFiles": "E:\\Files",                      // 📥 Input
-    "ExcelFiles": "E:\\Files\\ExcelFiles",            // 📁 Regular output
-    "ProcessedFiles": "E:\\Files\\Special_Sheets",    // 📂 Special sheets
-    "Logs": "Logs"                                     // 📝 Log files
+    "InputExcelFiles": "E:\\Files",                      // 📥 Input: Source Excel files
+    "OutputExcelFiles": "E:\\Files\\ExcelFiles",         // 📁 Output: Regular processed files
+    "SpecialExcelFiles": "E:\\Files\\Special_Sheets",   // 📂 Output: Special categorized files (SUP, DEM)
+    "LogFiles": "Logs",                                   // 📝 Logs: Application logs
+    "TempFiles": "Temp"                                   // 🗂️ Temp: Temporary files
   },
   "Processing": {
     "BatchSize": 1000000,                             // 🚀 1M rows/batch
@@ -326,7 +327,9 @@ docker run -v /data:/app/data universal-excel-tool
 |---------|-------------|---------|----------|
 | 🗄️ **Database.Server** | SQL Server instance | `localhost\\SQLEXPRESS` | ✅ Yes |
 | 📊 **Database.Database** | Target database | `RAW_PROCESS` | ✅ Yes |
-| 📥 **Paths.RawExcelFiles** | Input directory | `E:\\Files` | ✅ Yes |
+| 📥 **Paths.InputExcelFiles** | Input directory (source files) | `E:\\Files` | ✅ Yes |
+| 📁 **Paths.OutputExcelFiles** | Output directory (processed) | `E:\\Files\\ExcelFiles` | ✅ Yes |
+| 📂 **Paths.SpecialExcelFiles** | Special files (SUP, DEM) | `E:\\Files\\Special_Sheets` | ⚙️ Optional |
 | 📦 **Processing.BatchSize** | Rows per batch | `1000000` | ⚙️ Optional |
 | 🎯 **SpecialSheetKeywords** | Sheet categories | `["SUP", "DEM"]` | ⚙️ Optional |
 
@@ -802,7 +805,7 @@ UniversalExcelTool.exe --show-config
 **Symptoms:** No files to process message
 
 **Solutions:**
-- ✅ Check `Paths.RawExcelFiles` in configuration
+- ✅ Check `Paths.InputExcelFiles` in configuration
 - ✅ Ensure directory exists
 - ✅ Verify file extensions (`.xlsx`, `.xls`)
 - ✅ Check file permissions

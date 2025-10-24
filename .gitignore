@@ -79,19 +79,19 @@ Logs/
 # Application Data
 #######################
 # Excel files (input/output)
-**/RawExcelFiles/**/*.xlsx
-**/RawExcelFiles/**/*.xls
-**/ExcelFiles/**/*.xlsx
-**/ExcelFiles/**/*.xls
-**/ProcessedFiles/**/*.xlsx
-**/ProcessedFiles/**/*.xls
+**/InputExcelFiles/**/*.xlsx
+**/InputExcelFiles/**/*.xls
+**/OutputExcelFiles/**/*.xlsx
+**/OutputExcelFiles/**/*.xls
+**/SpecialExcelFiles/**/*.xlsx
+**/SpecialExcelFiles/**/*.xls
 **/Special_Sheets_Excels/**/*.xlsx
 **/Special_Sheets_Excels/**/*.xls
 
 # Keep directory structure
-!**/RawExcelFiles/.gitkeep
-!**/ExcelFiles/.gitkeep
-!**/ProcessedFiles/.gitkeep
+!**/InputExcelFiles/.gitkeep
+!**/OutputExcelFiles/.gitkeep
+!**/SpecialExcelFiles/.gitkeep
 !**/Special_Sheets_Excels/.gitkeep
 
 # Temporary files

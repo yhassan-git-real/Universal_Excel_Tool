@@ -34,17 +34,17 @@ namespace ETL_Excel.Modules
                 {
                     InputSettings = new Models.InputSettings
                     {
-                        InputFolderPath = _unifiedConfig.GetRawExcelFilesPath() // Base folder for raw Excel files
+                        InputFolderPath = _unifiedConfig.GetInputExcelFilesPath() // Input: Raw Excel files to process
                     },
                     OutputSettings = new Models.OutputSettings
                     {
-                        BaseFolderPath = _unifiedConfig.GetExcelFilesPath(), // Regular processed sheets go to ExcelFiles
-                        OtherCategoryFolder = _unifiedConfig.GetProcessedFilesPath(), // Special sheets absolute path: Files\Special_Sheets_Excels
+                        BaseFolderPath = _unifiedConfig.GetOutputExcelFilesPath(), // Output: Regular processed sheets
+                        OtherCategoryFolder = _unifiedConfig.GetSpecialExcelFilesPath(), // Output: Special sheets (SUP, DEM)
                         SpecialSheetKeywords = unifiedConfig.Processing.SpecialSheetKeywords?.ToList() ?? new List<string>()
                     },
                     LogSettings = new Models.LogSettings
                     {
-                        LogFolderPath = _unifiedConfig.GetLogsPath()
+                        LogFolderPath = _unifiedConfig.GetLogFilesPath()
                     },
                     ProcessingSettings = new Models.ProcessingSettings
                     {

@@ -166,27 +166,27 @@ namespace ETL_ExcelToDatabase.Core
         }
 
         /// <summary>
-        /// Gets the full path for Excel files directory
+        /// Gets the full path for output Excel files directory (regular processed files)
         /// </summary>
-        public string GetExcelFilesPath()
+        public string GetOutputExcelFilesPath()
         {
-            return ResolvePath(_config?.Paths.ExcelFiles ?? throw new InvalidOperationException("ExcelFiles path not configured"));
+            return ResolvePath(_config?.Paths.OutputExcelFiles ?? throw new InvalidOperationException("OutputExcelFiles path not configured"));
         }
 
         /// <summary>
-        /// Gets the full path for processed files directory
+        /// Gets the full path for special Excel files directory (categorized sheets like SUP, DEM)
         /// </summary>
-        public string GetProcessedFilesPath()
+        public string GetSpecialExcelFilesPath()
         {
-            return ResolvePath(_config?.Paths.ProcessedFiles ?? throw new InvalidOperationException("ProcessedFiles path not configured"));
+            return ResolvePath(_config?.Paths.SpecialExcelFiles ?? throw new InvalidOperationException("SpecialExcelFiles path not configured"));
         }
 
         /// <summary>
-        /// Gets the full path for logs directory
+        /// Gets the full path for log files directory
         /// </summary>
-        public string GetLogsPath()
+        public string GetLogFilesPath()
         {
-            return ResolvePath(_config?.Paths.Logs ?? throw new InvalidOperationException("Logs path not configured"));
+            return ResolvePath(_config?.Paths.LogFiles ?? throw new InvalidOperationException("LogFiles path not configured"));
         }
 
         /// <summary>

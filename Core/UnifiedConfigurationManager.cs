@@ -166,35 +166,35 @@ namespace UniversalExcelTool.Core
         }
 
         /// <summary>
-        /// Gets the full path for raw Excel files directory (input)
+        /// Gets the full path for input Excel files directory (raw/source files)
         /// </summary>
-        public string GetRawExcelFilesPath()
+        public string GetInputExcelFilesPath()
         {
-            return ResolvePath(_config?.Paths.RawExcelFiles ?? throw new InvalidOperationException("RawExcelFiles path not configured"));
+            return ResolvePath(_config?.Paths.InputExcelFiles ?? throw new InvalidOperationException("InputExcelFiles path not configured"));
         }
 
         /// <summary>
-        /// Gets the full path for Excel files directory (regular processed files)
+        /// Gets the full path for output Excel files directory (regular processed files)
         /// </summary>
-        public string GetExcelFilesPath()
+        public string GetOutputExcelFilesPath()
         {
-            return ResolvePath(_config?.Paths.ExcelFiles ?? throw new InvalidOperationException("ExcelFiles path not configured"));
+            return ResolvePath(_config?.Paths.OutputExcelFiles ?? throw new InvalidOperationException("OutputExcelFiles path not configured"));
         }
 
         /// <summary>
-        /// Gets the full path for processed files directory
+        /// Gets the full path for special Excel files directory (categorized sheets like SUP, DEM)
         /// </summary>
-        public string GetProcessedFilesPath()
+        public string GetSpecialExcelFilesPath()
         {
-            return ResolvePath(_config?.Paths.ProcessedFiles ?? throw new InvalidOperationException("ProcessedFiles path not configured"));
+            return ResolvePath(_config?.Paths.SpecialExcelFiles ?? throw new InvalidOperationException("SpecialExcelFiles path not configured"));
         }
 
         /// <summary>
-        /// Gets the full path for logs directory
+        /// Gets the full path for log files directory
         /// </summary>
-        public string GetLogsPath()
+        public string GetLogFilesPath()
         {
-            return ResolvePath(_config?.Paths.Logs ?? throw new InvalidOperationException("Logs path not configured"));
+            return ResolvePath(_config?.Paths.LogFiles ?? throw new InvalidOperationException("LogFiles path not configured"));
         }
 
         /// <summary>
@@ -270,9 +270,9 @@ namespace UniversalExcelTool.Core
             {
                 var directories = new[]
                 {
-                    GetExcelFilesPath(),
-                    GetProcessedFilesPath(),
-                    GetLogsPath(),
+                    GetOutputExcelFilesPath(),
+                    GetSpecialExcelFilesPath(),
+                    GetLogFilesPath(),
                     ResolvePath(_config?.Paths.TempFiles ?? throw new InvalidOperationException("TempFiles path not configured"))
                 };
 
@@ -381,8 +381,10 @@ namespace UniversalExcelTool.Core
             Console.WriteLine($"Environment: {_config.Environment.Environment}");
             Console.WriteLine($"Database Server: {_config.Database.Server}");
             Console.WriteLine($"Database Name: {_config.Database.Database}");
-            Console.WriteLine($"Excel Files Path: {GetExcelFilesPath()}");
-            Console.WriteLine($"Logs Path: {GetLogsPath()}");
+            Console.WriteLine($"Input Excel Path: {GetInputExcelFilesPath()}");
+            Console.WriteLine($"Output Excel Path: {GetOutputExcelFilesPath()}");
+            Console.WriteLine($"Special Excel Path: {GetSpecialExcelFilesPath()}");
+            Console.WriteLine($"Log Files Path: {GetLogFilesPath()}");
             Console.WriteLine($"Batch Size: {_config.Processing.BatchSize:N0}");
             Console.WriteLine();
         }
