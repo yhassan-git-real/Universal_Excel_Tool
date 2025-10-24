@@ -2,7 +2,9 @@ using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using UniversalExcelTool.UI.Models;
@@ -38,18 +40,67 @@ namespace UniversalExcelTool.UI.ViewModels
         [ObservableProperty]
         private ProgressInfo _progressInfo = new();
 
+        [ObservableProperty]
+        private bool _canRunOperation = true;
+
+        [ObservableProperty]
+        private string _operationStatusMessage = string.Empty;
+
+        [ObservableProperty]
+        private bool _isOperationRunning;
+
+        [ObservableProperty]
+        private bool _canCancelOperation;
+
         private readonly IUILogger _logger;
         private readonly IProgressReporter _progressReporter;
         private readonly UnifiedConfigurationManager _configManager;
+        private readonly IOperationStateService _operationStateService;
         private AvaloniaLogger? _processLogger;
+        private CancellationTokenSource? _cancellationTokenSource;
 
         public DashboardViewModel()
         {
             _logger = new AvaloniaLogger(_logEntries);
             _progressReporter = new AvaloniaProgressReporter(_progressInfo, () => { });
             _configManager = UnifiedConfigurationManager.Instance;
+            _operationStateService = OperationStateService.Instance;
+            
+            // Subscribe to operation state changes
+            _operationStateService.OperationStateChanged += OnOperationStateChanged;
+            
+            // Initialize with current operation state
+            var currentOp = _operationStateService.CurrentOperation;
+            if (currentOp != null && currentOp.State == OperationState.Running)
+            {
+                IsOperationRunning = true;
+                CanRunOperation = false;
+                CanCancelOperation = true;
+                OperationStatusMessage = currentOp.GetStatusMessage();
+            }
             
             InitializeAsync();
+        }
+
+        private void OnOperationStateChanged(object? sender, OperationStateChangedEventArgs e)
+        {
+            // Ensure UI updates happen on the UI thread
+            Dispatcher.UIThread.Post(() =>
+            {
+                // Update UI based on operation state
+                IsOperationRunning = e.Operation != null && e.Operation.State == OperationState.Running;
+                CanRunOperation = e.Operation == null || e.Operation.State != OperationState.Running;
+                CanCancelOperation = e.Operation != null && e.Operation.State == OperationState.Running;
+                
+                if (e.Operation != null)
+                {
+                    OperationStatusMessage = e.Operation.GetStatusMessage();
+                }
+                else
+                {
+                    OperationStatusMessage = string.Empty;
+                }
+            });
         }
 
         private async void InitializeAsync()
@@ -117,6 +168,22 @@ namespace UniversalExcelTool.UI.ViewModels
                 return;
             }
 
+            // Check if another operation is already running
+            if (!_operationStateService.TryStartOperation(OperationType.CompleteETL, "Complete ETL Process"))
+            {
+                var statusMsg = _operationStateService.GetOperationStatusMessage();
+                _logger.LogWarning($"Cannot start operation: {statusMsg}");
+                
+                // Show notification to user
+                Views.MainWindow.NotificationService?.ShowWarning(
+                    "Operation Already Running",
+                    statusMsg ?? "Another operation is currently in progress. Please wait or cancel the existing operation.");
+                return;
+            }
+
+            // Create cancellation token for this operation
+            _cancellationTokenSource = new CancellationTokenSource();
+
             try
             {
                 IsBusy = true;
@@ -130,16 +197,31 @@ namespace UniversalExcelTool.UI.ViewModels
                 
                 var stopwatch = Stopwatch.StartNew();
                 _processLogger.LogInfo("═══════════════════════════════════════════", "etl");
-                _processLogger.LogInfo("Starting Complete ETL Process", "etl");
+                _processLogger.LogInfo($"Starting Complete ETL Process (ID: {_operationStateService.CurrentOperation?.OperationId:N})", "etl");
                 _processLogger.LogInfo("═══════════════════════════════════════════", "etl");
 
                 // Create orchestrator with file logger
                 var orchestrator = new ETLOrchestratorWithLogger(_processLogger, _progressReporter);
                 
-                // Execute ETL process
-                bool success = await Task.Run(() => orchestrator.RunCompleteETLProcessAsync());
+                // Execute ETL process with cancellation token
+                bool success = await Task.Run(() => orchestrator.RunCompleteETLProcessAsync(null, _cancellationTokenSource.Token), _cancellationTokenSource.Token);
                 
                 stopwatch.Stop();
+
+                // Check if operation was cancelled
+                if (_cancellationTokenSource.Token.IsCancellationRequested)
+                {
+                    _processLogger.LogWarning($"ETL process cancelled after {stopwatch.Elapsed:hh\\:mm\\:ss}");
+                    _progressReporter.ReportComplete(false, stopwatch.Elapsed, "Operation cancelled by user");
+                    LastExecutionInfo = $"Last run: {DateTime.Now:yyyy-MM-dd HH:mm:ss} (Cancelled)";
+                    
+                    _operationStateService.CancelOperation();
+                    
+                    Views.MainWindow.NotificationService?.ShowWarning(
+                        "ETL Cancelled", 
+                        $"Process was cancelled after {stopwatch.Elapsed:mm\\:ss}");
+                    return;
+                }
 
                 if (success)
                 {
@@ -150,6 +232,9 @@ namespace UniversalExcelTool.UI.ViewModels
                     // Update execution info
                     LastExecutionInfo = $"Last run: {DateTime.Now:yyyy-MM-dd HH:mm:ss} (Success)";
                     TotalFilesProcessed++;
+                    
+                    // Complete operation successfully
+                    _operationStateService.CompleteOperation(true, "Process completed successfully");
                     
                     // Show success notification
                     Views.MainWindow.NotificationService?.ShowSuccess(
@@ -163,17 +248,35 @@ namespace UniversalExcelTool.UI.ViewModels
                     _progressReporter.ReportComplete(false, stopwatch.Elapsed, "Process completed with errors");
                     LastExecutionInfo = $"Last run: {DateTime.Now:yyyy-MM-dd HH:mm:ss} (Failed)";
                     
+                    // Complete operation with failure
+                    _operationStateService.CompleteOperation(false, "Process completed with errors");
+                    
                     // Show error notification
                     Views.MainWindow.NotificationService?.ShowError(
                         "ETL Failed", 
                         "Process completed with errors. Check logs for details.");
                 }
             }
+            catch (OperationCanceledException)
+            {
+                _processLogger?.LogWarning("ETL process was cancelled");
+                _progressReporter.ReportError("Operation cancelled");
+                LastExecutionInfo = $"Last run: {DateTime.Now:yyyy-MM-dd HH:mm:ss} (Cancelled)";
+                
+                _operationStateService.CancelOperation();
+                
+                Views.MainWindow.NotificationService?.ShowWarning(
+                    "ETL Cancelled", 
+                    "Process was cancelled by user");
+            }
             catch (Exception ex)
             {
                 _processLogger?.LogError($"ETL execution failed: {ex.Message}");
                 _progressReporter.ReportError(ex.Message);
                 LastExecutionInfo = $"Last run: {DateTime.Now:yyyy-MM-dd HH:mm:ss} (Error)";
+                
+                // Complete operation with error
+                _operationStateService.CompleteOperation(false, $"Error: {ex.Message}");
                 
                 // Show error notification
                 Views.MainWindow.NotificationService?.ShowError(
@@ -184,6 +287,19 @@ namespace UniversalExcelTool.UI.ViewModels
             {
                 IsBusy = false;
                 BusyMessage = string.Empty;
+                _processLogger?.CloseLog();
+                _cancellationTokenSource?.Dispose();
+                _cancellationTokenSource = null;
+            }
+        }
+
+        [RelayCommand]
+        private void CancelOperation()
+        {
+            if (_cancellationTokenSource != null && !_cancellationTokenSource.Token.IsCancellationRequested)
+            {
+                _logger.LogWarning("Cancelling ETL operation...");
+                _cancellationTokenSource.Cancel();
             }
         }
 

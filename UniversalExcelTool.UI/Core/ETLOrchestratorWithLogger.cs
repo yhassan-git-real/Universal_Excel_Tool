@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using UniversalExcelTool.Core;
 using UniversalExcelTool.UI.Services;
@@ -26,7 +27,7 @@ namespace UniversalExcelTool.UI.ViewModels
         /// <summary>
         /// Runs the complete ETL process with all modules
         /// </summary>
-        public async Task<bool> RunCompleteETLProcessAsync(ETLProcessOptions? options = null)
+        public async Task<bool> RunCompleteETLProcessAsync(ETLProcessOptions? options = null, CancellationToken cancellationToken = default)
         {
             options ??= new ETLProcessOptions();
 
@@ -45,7 +46,7 @@ namespace UniversalExcelTool.UI.ViewModels
                 if (!options.SkipDynamicTableConfig)
                 {
                     _progressReporter.ReportProgress(10, "Step 1: Dynamic Table Configuration");
-                    success = await RunDynamicTableManagerAsync(options);
+                    success = await RunDynamicTableManagerAsync(options, cancellationToken);
                     _progressReporter.ReportProgress(30, "Dynamic Table Configuration completed");
                     
                     if (!success && !options.ContinueOnError)
@@ -59,7 +60,7 @@ namespace UniversalExcelTool.UI.ViewModels
                 if (success || options.ContinueOnError)
                 {
                     _progressReporter.ReportProgress(30, "Step 2: Excel Processing");
-                    success = await RunExcelProcessorAsync(options);
+                    success = await RunExcelProcessorAsync(options, cancellationToken);
                     _progressReporter.ReportProgress(70, "Excel Processing completed");
                     
                     if (!success && !options.ContinueOnError)
@@ -73,7 +74,7 @@ namespace UniversalExcelTool.UI.ViewModels
                 if (success || options.ContinueOnError)
                 {
                     _progressReporter.ReportProgress(70, "Step 3: Database Loading");
-                    success = await RunDatabaseLoaderAsync(options);
+                    success = await RunDatabaseLoaderAsync(options, cancellationToken);
                     _progressReporter.ReportProgress(100, "Database Loading completed");
                 }
 
@@ -103,7 +104,7 @@ namespace UniversalExcelTool.UI.ViewModels
         /// <summary>
         /// Runs only the Dynamic Table Manager
         /// </summary>
-        public async Task<bool> RunDynamicTableManagerAsync(ETLProcessOptions? options = null)
+        public async Task<bool> RunDynamicTableManagerAsync(ETLProcessOptions? options = null, CancellationToken cancellationToken = default)
         {
             options ??= new ETLProcessOptions();
 
@@ -118,7 +119,7 @@ namespace UniversalExcelTool.UI.ViewModels
 
                 string arguments = options.DynamicTableManagerArgs ?? moduleInfo.Arguments;
 
-                return await ExecuteModuleAsync(executablePath, arguments, moduleInfo.Name);
+                return await ExecuteModuleAsync(executablePath, arguments, moduleInfo.Name, cancellationToken);
             }
             catch (Exception ex)
             {
@@ -130,7 +131,7 @@ namespace UniversalExcelTool.UI.ViewModels
         /// <summary>
         /// Runs only the Excel Processor
         /// </summary>
-        public async Task<bool> RunExcelProcessorAsync(ETLProcessOptions? options = null)
+        public async Task<bool> RunExcelProcessorAsync(ETLProcessOptions? options = null, CancellationToken cancellationToken = default)
         {
             options ??= new ETLProcessOptions();
 
@@ -145,7 +146,7 @@ namespace UniversalExcelTool.UI.ViewModels
 
                 string arguments = options.ExcelProcessorArgs ?? moduleInfo.Arguments;
 
-                return await ExecuteModuleAsync(executablePath, arguments, moduleInfo.Name);
+                return await ExecuteModuleAsync(executablePath, arguments, moduleInfo.Name, cancellationToken);
             }
             catch (Exception ex)
             {
@@ -157,7 +158,7 @@ namespace UniversalExcelTool.UI.ViewModels
         /// <summary>
         /// Runs only the Database Loader
         /// </summary>
-        public async Task<bool> RunDatabaseLoaderAsync(ETLProcessOptions? options = null)
+        public async Task<bool> RunDatabaseLoaderAsync(ETLProcessOptions? options = null, CancellationToken cancellationToken = default)
         {
             options ??= new ETLProcessOptions();
 
@@ -172,7 +173,7 @@ namespace UniversalExcelTool.UI.ViewModels
 
                 string arguments = options.DatabaseLoaderArgs ?? moduleInfo.Arguments;
 
-                return await ExecuteModuleAsync(executablePath, arguments, moduleInfo.Name);
+                return await ExecuteModuleAsync(executablePath, arguments, moduleInfo.Name, cancellationToken);
             }
             catch (Exception ex)
             {
@@ -184,8 +185,10 @@ namespace UniversalExcelTool.UI.ViewModels
         /// <summary>
         /// Executes a module with the specified parameters
         /// </summary>
-        private async Task<bool> ExecuteModuleAsync(string executablePath, string arguments, string moduleName)
+        private async Task<bool> ExecuteModuleAsync(string executablePath, string arguments, string moduleName, CancellationToken cancellationToken = default)
         {
+            Process? process = null;
+            
             try
             {
                 if (!File.Exists(executablePath))
@@ -210,10 +213,30 @@ namespace UniversalExcelTool.UI.ViewModels
                         WorkingDirectory = _configManager.GetRootDirectory()
                     };
 
-                    var process = Process.Start(startInfo);
+                    process = Process.Start(startInfo);
                     if (process != null)
                     {
-                        await process.WaitForExitAsync();
+                        // Polling loop to support cancellation
+                        while (!process.HasExited)
+                        {
+                            if (cancellationToken.IsCancellationRequested)
+                            {
+                                _logger.LogWarning($"Cancellation requested. Terminating {moduleName}...");
+                                try
+                                {
+                                    process.Kill(entireProcessTree: true);
+                                    _logger.LogWarning($"{moduleName} terminated.");
+                                }
+                                catch (Exception ex)
+                                {
+                                    _logger.LogError($"Error terminating {moduleName}: {ex.Message}");
+                                }
+                                return false;
+                            }
+                            
+                            await Task.Delay(100, CancellationToken.None); // Don't pass cancellation token to Delay
+                        }
+                        
                         bool success = process.ExitCode == 0;
                         
                         if (success)
@@ -240,40 +263,69 @@ namespace UniversalExcelTool.UI.ViewModels
                     StandardErrorEncoding = System.Text.Encoding.UTF8
                 };
 
-                using var proc = new Process { StartInfo = processStartInfo };
+                process = new Process { StartInfo = processStartInfo };
 
-                proc.OutputDataReceived += (sender, e) =>
+                process.OutputDataReceived += (sender, e) =>
                 {
                     if (!string.IsNullOrEmpty(e.Data))
                         _logger.LogInfo($"[{moduleName}] {e.Data}", "module");
                 };
 
-                proc.ErrorDataReceived += (sender, e) =>
+                process.ErrorDataReceived += (sender, e) =>
                 {
                     if (!string.IsNullOrEmpty(e.Data))
                         _logger.LogError($"[{moduleName}] {e.Data}");
                 };
 
-                proc.Start();
-                proc.BeginOutputReadLine();
-                proc.BeginErrorReadLine();
-                await proc.WaitForExitAsync();
+                process.Start();
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
+                
+                // Polling loop to support cancellation
+                while (!process.HasExited)
+                {
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        _logger.LogWarning($"Cancellation requested. Terminating {moduleName}...");
+                        try
+                        {
+                            process.Kill(entireProcessTree: true);
+                            _logger.LogWarning($"{moduleName} terminated.");
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError($"Error terminating {moduleName}: {ex.Message}");
+                        }
+                        return false;
+                    }
+                    
+                    await Task.Delay(100, CancellationToken.None); // Don't pass cancellation token to Delay
+                }
 
-                if (proc.ExitCode == 0)
+                if (process.ExitCode == 0)
                 {
                     _logger.LogSuccess($"{moduleName} completed successfully");
                     return true;
                 }
                 else
                 {
-                    _logger.LogError($"{moduleName} failed with exit code: {proc.ExitCode}");
+                    _logger.LogError($"{moduleName} failed with exit code: {process.ExitCode}");
                     return false;
                 }
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogWarning($"{moduleName} was cancelled.");
+                return false;
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Error executing {moduleName}: {ex.Message}");
                 return false;
+            }
+            finally
+            {
+                process?.Dispose();
             }
         }
 

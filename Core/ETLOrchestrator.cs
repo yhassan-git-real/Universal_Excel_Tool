@@ -24,7 +24,7 @@ namespace UniversalExcelTool.Core
         /// <summary>
         /// Runs the complete ETL process with all modules
         /// </summary>
-        public async Task<bool> RunCompleteETLProcessAsync(ETLProcessOptions? options = null)
+        public async Task<bool> RunCompleteETLProcessAsync(ETLProcessOptions? options = null, CancellationToken cancellationToken = default)
         {
             options ??= new ETLProcessOptions();
             
@@ -44,7 +44,7 @@ namespace UniversalExcelTool.Core
                 // Step 1: Dynamic Table Configuration
                 if (!options.SkipDynamicTableConfig)
                 {
-                    success = await RunDynamicTableManagerAsync(options);
+                    success = await RunDynamicTableManagerAsync(options, cancellationToken);
                     if (!success && !options.ContinueOnError)
                     {
                         LogError("Dynamic Table Manager failed. Stopping process.");
@@ -55,7 +55,7 @@ namespace UniversalExcelTool.Core
                 // Step 2: Excel Processing
                 if (success || options.ContinueOnError)
                 {
-                    success = await RunExcelProcessorAsync(options);
+                    success = await RunExcelProcessorAsync(options, cancellationToken);
                     if (!success && !options.ContinueOnError)
                     {
                         LogError("Excel Processor failed. Stopping process.");
@@ -66,7 +66,7 @@ namespace UniversalExcelTool.Core
                 // Step 3: Database Loading
                 if (success || options.ContinueOnError)
                 {
-                    success = await RunDatabaseLoaderAsync(options);
+                    success = await RunDatabaseLoaderAsync(options, cancellationToken);
                 }
 
                 stopwatch.Stop();
@@ -95,7 +95,7 @@ namespace UniversalExcelTool.Core
         /// <summary>
         /// Runs only the Dynamic Table Manager
         /// </summary>
-        public async Task<bool> RunDynamicTableManagerAsync(ETLProcessOptions? options = null)
+        public async Task<bool> RunDynamicTableManagerAsync(ETLProcessOptions? options = null, CancellationToken cancellationToken = default)
         {
             options ??= new ETLProcessOptions();
             
@@ -110,7 +110,7 @@ namespace UniversalExcelTool.Core
                 
                 string arguments = options.DynamicTableManagerArgs ?? moduleInfo.Arguments;
                 
-                return await ExecuteModuleAsync(executablePath, arguments, moduleInfo.Name);
+                return await ExecuteModuleAsync(executablePath, arguments, moduleInfo.Name, cancellationToken);
             }
             catch (Exception ex)
             {
@@ -120,9 +120,9 @@ namespace UniversalExcelTool.Core
         }
 
         /// <summary>
-        /// Runs only the Excel Processor
+        /// Runs only the Excel Processor module
         /// </summary>
-        public async Task<bool> RunExcelProcessorAsync(ETLProcessOptions? options = null)
+        public async Task<bool> RunExcelProcessorAsync(ETLProcessOptions? options = null, CancellationToken cancellationToken = default)
         {
             options ??= new ETLProcessOptions();
             
@@ -137,7 +137,7 @@ namespace UniversalExcelTool.Core
                 
                 string arguments = options.ExcelProcessorArgs ?? moduleInfo.Arguments;
                 
-                return await ExecuteModuleAsync(executablePath, arguments, moduleInfo.Name);
+                return await ExecuteModuleAsync(executablePath, arguments, moduleInfo.Name, cancellationToken);
             }
             catch (Exception ex)
             {
@@ -147,9 +147,9 @@ namespace UniversalExcelTool.Core
         }
 
         /// <summary>
-        /// Runs only the Database Loader
+        /// Runs only the Database Loader module
         /// </summary>
-        public async Task<bool> RunDatabaseLoaderAsync(ETLProcessOptions? options = null)
+        public async Task<bool> RunDatabaseLoaderAsync(ETLProcessOptions? options = null, CancellationToken cancellationToken = default)
         {
             options ??= new ETLProcessOptions();
             
@@ -164,7 +164,7 @@ namespace UniversalExcelTool.Core
                 
                 string arguments = options.DatabaseLoaderArgs ?? moduleInfo.Arguments;
                 
-                return await ExecuteModuleAsync(executablePath, arguments, moduleInfo.Name);
+                return await ExecuteModuleAsync(executablePath, arguments, moduleInfo.Name, cancellationToken);
             }
             catch (Exception ex)
             {
@@ -176,8 +176,9 @@ namespace UniversalExcelTool.Core
         /// <summary>
         /// Executes a module with the specified parameters
         /// </summary>
-        private async Task<bool> ExecuteModuleAsync(string executablePath, string arguments, string moduleName)
+        private async Task<bool> ExecuteModuleAsync(string executablePath, string arguments, string moduleName, CancellationToken cancellationToken = default)
         {
+            Process? process = null;
             try
             {
                 if (!File.Exists(executablePath))
@@ -208,10 +209,21 @@ namespace UniversalExcelTool.Core
                         WorkingDirectory = _configManager.GetRootDirectory()
                     };
 
-                    var process = Process.Start(startInfo);
+                    process = Process.Start(startInfo);
                     if (process != null)
                     {
-                        await process.WaitForExitAsync();
+                        // Wait for process with cancellation support
+                        while (!process.HasExited)
+                        {
+                            if (cancellationToken.IsCancellationRequested)
+                            {
+                                LogWarning($"Cancellation requested. Terminating {moduleName}...");
+                                process.Kill(entireProcessTree: true);
+                                LogWarning($"{moduleName} terminated.");
+                                return false;
+                            }
+                            await Task.Delay(100, cancellationToken);
+                        }
                         return process.ExitCode == 0;
                     }
                     return false;
@@ -229,40 +241,65 @@ namespace UniversalExcelTool.Core
                     WorkingDirectory = _configManager.GetRootDirectory()
                 };
 
-                using var proc = new Process { StartInfo = processStartInfo };
+                process = new Process { StartInfo = processStartInfo };
                 
-                proc.OutputDataReceived += (sender, e) =>
+                process.OutputDataReceived += (sender, e) =>
                 {
                     if (!string.IsNullOrEmpty(e.Data))
                         LogInfo($"[{moduleName}] {e.Data}");
                 };
 
-                proc.ErrorDataReceived += (sender, e) =>
+                process.ErrorDataReceived += (sender, e) =>
                 {
                     if (!string.IsNullOrEmpty(e.Data))
                         LogError($"[{moduleName}] {e.Data}");
                 };
 
-                proc.Start();
-                proc.BeginOutputReadLine();
-                proc.BeginErrorReadLine();
-                await proc.WaitForExitAsync();
+                process.Start();
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
+                
+                // Wait for process with cancellation support
+                while (!process.HasExited)
+                {
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        LogWarning($"Cancellation requested. Terminating {moduleName}...");
+                        process.Kill(entireProcessTree: true);
+                        LogWarning($"{moduleName} terminated.");
+                        return false;
+                    }
+                    await Task.Delay(100, cancellationToken);
+                }
 
-                if (proc.ExitCode == 0)
+                if (process.ExitCode == 0)
                 {
                     LogSuccess($"{moduleName} completed successfully");
                     return true;
                 }
                 else
                 {
-                    LogError($"{moduleName} failed with exit code: {proc.ExitCode}");
+                    LogError($"{moduleName} failed with exit code: {process.ExitCode}");
                     return false;
                 }
+            }
+            catch (OperationCanceledException)
+            {
+                LogWarning($"{moduleName} was cancelled");
+                if (process != null && !process.HasExited)
+                {
+                    process.Kill(entireProcessTree: true);
+                }
+                return false;
             }
             catch (Exception ex)
             {
                 LogError($"Error executing {moduleName}: {ex.Message}");
                 return false;
+            }
+            finally
+            {
+                process?.Dispose();
             }
         }
 
@@ -329,6 +366,18 @@ namespace UniversalExcelTool.Core
         {
             string logMessage = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} [ERROR] {message}";
             Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(logMessage);
+            Console.ResetColor();
+            AppendToLogFile(logMessage);
+        }
+
+        /// <summary>
+        /// Logs a warning message
+        /// </summary>
+        private void LogWarning(string message)
+        {
+            string logMessage = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} [WARNING] {message}";
+            Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine(logMessage);
             Console.ResetColor();
             AppendToLogFile(logMessage);

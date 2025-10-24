@@ -122,32 +122,84 @@
                             </StackPanel>
                         </StackPanel>
                         
-                        <!-- Action Button -->
-                        <Button Command="{Binding RunCompleteETLCommand}"
-                                HorizontalAlignment="Stretch"
-                                HorizontalContentAlignment="Center"
-                                VerticalContentAlignment="Center"
-                                Height="36"
-                                Background="#10B981"
-                                Foreground="White"
-                                BorderThickness="0"
+                        <!-- Operation Status -->
+                        <Border IsVisible="{Binding IsOperationRunning}"
+                                Background="#FEF3C7"
+                                BorderBrush="#F59E0B"
+                                BorderThickness="1"
                                 CornerRadius="6"
-                                FontSize="12"
-                                FontWeight="Medium"
-                                Padding="12,0"
-                                Cursor="Hand">
-                            <TextBlock Text="Run Complete ETL"
-                                       HorizontalAlignment="Center"
-                                       VerticalAlignment="Center"/>
-                            <Button.Styles>
-                                <Style Selector="Button:pointerover">
-                                    <Setter Property="Background" Value="#059669"/>
-                                </Style>
-                                <Style Selector="Button:pressed">
-                                    <Setter Property="Background" Value="#047857"/>
-                                </Style>
-                            </Button.Styles>
-                        </Button>
+                                Padding="10,8"
+                                Margin="0,0,0,8">
+                            <TextBlock Text="{Binding OperationStatusMessage}"
+                                       FontSize="11"
+                                       Foreground="#92400E"
+                                       TextWrapping="Wrap"/>
+                        </Border>
+                        
+                        <!-- Action Buttons -->
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Button Grid.Column="0"
+                                    Command="{Binding RunCompleteETLCommand}"
+                                    IsEnabled="{Binding CanRunOperation}"
+                                    HorizontalAlignment="Stretch"
+                                    HorizontalContentAlignment="Center"
+                                    VerticalContentAlignment="Center"
+                                    Height="36"
+                                    Background="#10B981"
+                                    Foreground="White"
+                                    BorderThickness="0"
+                                    CornerRadius="6"
+                                    FontSize="12"
+                                    FontWeight="Medium"
+                                    Padding="12,0"
+                                    Margin="0,0,8,0"
+                                    Cursor="Hand">
+                                <TextBlock Text="Run Complete ETL"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                                <Button.Styles>
+                                    <Style Selector="Button:pointerover">
+                                        <Setter Property="Background" Value="#059669"/>
+                                    </Style>
+                                    <Style Selector="Button:pressed">
+                                        <Setter Property="Background" Value="#047857"/>
+                                    </Style>
+                                    <Style Selector="Button:disabled">
+                                        <Setter Property="Background" Value="#D1D5DB"/>
+                                        <Setter Property="Foreground" Value="#9CA3AF"/>
+                                    </Style>
+                                </Button.Styles>
+                            </Button>
+                            
+                            <Button Grid.Column="1"
+                                    Command="{Binding CancelOperationCommand}"
+                                    IsVisible="{Binding CanCancelOperation}"
+                                    HorizontalAlignment="Right"
+                                    HorizontalContentAlignment="Center"
+                                    VerticalContentAlignment="Center"
+                                    Width="36"
+                                    Height="36"
+                                    Background="#EF4444"
+                                    Foreground="White"
+                                    BorderThickness="0"
+                                    CornerRadius="6"
+                                    FontSize="14"
+                                    Padding="0"
+                                    ToolTip.Tip="Cancel Operation"
+                                    Cursor="Hand">
+                                <TextBlock Text="✕"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                                <Button.Styles>
+                                    <Style Selector="Button:pointerover">
+                                        <Setter Property="Background" Value="#DC2626"/>
+                                    </Style>
+                                    <Style Selector="Button:pressed">
+                                        <Setter Property="Background" Value="#B91C1C"/>
+                                    </Style>
+                                </Button.Styles>
+                            </Button>
+                        </Grid>
                     </StackPanel>
                 </Border>
 

@@ -18,10 +18,10 @@ namespace ETL_DynamicTableManager
                 UserInputService.DisplayHeader();
                 
                 // Parse command line arguments
-                bool skipUserInput = args.Contains("--skip-input") || args.Contains("-s");
+                bool validateOnly = args.Contains("--validate-only") || args.Contains("-v");
+                bool skipUserInput = args.Contains("--skip-input") || args.Contains("-s") || validateOnly;
                 bool showCurrentConfig = args.Contains("--show-config") || args.Contains("-c");
                 bool deleteConfig = args.Contains("--delete-config") || args.Contains("-d");
-                bool validateOnly = args.Contains("--validate-only") || args.Contains("-v");
                 
                 // Handle special commands
                 if (showCurrentConfig)

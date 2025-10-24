@@ -14,6 +14,13 @@ namespace UniversalExcelTool.UI.ViewModels
     {
         private System.Threading.Timer? _clockTimer;
 
+        // Cache ViewModels to preserve state across navigation
+        private DashboardViewModel? _dashboardViewModel;
+        private ExcelProcessorViewModel? _excelProcessorViewModel;
+        private DatabaseLoaderViewModel? _databaseLoaderViewModel;
+        private DynamicTableConfigViewModel? _dynamicTableConfigViewModel;
+        private SettingsViewModel? _settingsViewModel;
+
         [ObservableProperty]
         private ViewModelBase? _currentViewModel;
 
@@ -50,7 +57,11 @@ namespace UniversalExcelTool.UI.ViewModels
         [RelayCommand]
         private void NavigateToDashboard()
         {
-            CurrentViewModel = new DashboardViewModel();
+            if (_dashboardViewModel == null)
+            {
+                _dashboardViewModel = new DashboardViewModel();
+            }
+            CurrentViewModel = _dashboardViewModel;
             CurrentPageIcon = "📊";
             CurrentPageTitle = "Dashboard";
             CurrentPageDescription = "Monitor your ETL operations and system status";
@@ -59,7 +70,11 @@ namespace UniversalExcelTool.UI.ViewModels
         [RelayCommand]
         private void NavigateToTableConfig()
         {
-            CurrentViewModel = new DynamicTableConfigViewModel();
+            if (_dynamicTableConfigViewModel == null)
+            {
+                _dynamicTableConfigViewModel = new DynamicTableConfigViewModel();
+            }
+            CurrentViewModel = _dynamicTableConfigViewModel;
             CurrentPageIcon = "🔧";
             CurrentPageTitle = "Table Configuration";
             CurrentPageDescription = "Configure and manage dynamic database tables";
@@ -68,7 +83,11 @@ namespace UniversalExcelTool.UI.ViewModels
         [RelayCommand]
         private void NavigateToExcelProcessor()
         {
-            CurrentViewModel = new ExcelProcessorViewModel();
+            if (_excelProcessorViewModel == null)
+            {
+                _excelProcessorViewModel = new ExcelProcessorViewModel();
+            }
+            CurrentViewModel = _excelProcessorViewModel;
             CurrentPageIcon = "📄";
             CurrentPageTitle = "Excel Processor";
             CurrentPageDescription = "Process and transform Excel files";
@@ -77,7 +96,11 @@ namespace UniversalExcelTool.UI.ViewModels
         [RelayCommand]
         private void NavigateToDatabaseLoader()
         {
-            CurrentViewModel = new DatabaseLoaderViewModel();
+            if (_databaseLoaderViewModel == null)
+            {
+                _databaseLoaderViewModel = new DatabaseLoaderViewModel();
+            }
+            CurrentViewModel = _databaseLoaderViewModel;
             CurrentPageIcon = "🗄️";
             CurrentPageTitle = "Database Loader";
             CurrentPageDescription = "Load processed data into database";
@@ -86,7 +109,11 @@ namespace UniversalExcelTool.UI.ViewModels
         [RelayCommand]
         private void NavigateToSettings()
         {
-            CurrentViewModel = new SettingsViewModel();
+            if (_settingsViewModel == null)
+            {
+                _settingsViewModel = new SettingsViewModel();
+            }
+            CurrentViewModel = _settingsViewModel;
             CurrentPageIcon = "⚙️";
             CurrentPageTitle = "Settings";
             CurrentPageDescription = "Configure application settings and preferences";

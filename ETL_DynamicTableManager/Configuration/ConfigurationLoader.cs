@@ -31,7 +31,7 @@ namespace ETL_DynamicTableManager.Configuration
                 },
                 ProcessConfig = new Models.ProcessConfig
                 {
-                    ExcelFolderPath = config.Paths.ExcelFiles,
+                    ExcelFolderPath = config.Paths.InputExcelFiles,
                     TempTableName = "",
                     DestinationTableName = "",
                     ErrorTableName = config.Tables.ErrorTableName,
@@ -39,7 +39,7 @@ namespace ETL_DynamicTableManager.Configuration
                     BatchSize = config.Processing.BatchSize,
                     ValidateColumnMapping = config.Processing.ValidateColumnMapping,
                     DefaultSheetName = config.Processing.DefaultSheetName,
-                    LogFolderPath = config.Paths.Logs
+                    LogFolderPath = config.Paths.LogFiles
                 }
             };
         }

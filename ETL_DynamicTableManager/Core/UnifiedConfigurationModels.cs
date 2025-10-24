@@ -42,11 +42,11 @@ namespace ETL_DynamicTableManager.Core
     /// </summary>
     public class PathsConfig
     {
-        public string ExcelFiles { get; set; } = string.Empty;
-        public string ProcessedFiles { get; set; } = string.Empty;
-        public string Logs { get; set; } = string.Empty;
+        public string InputExcelFiles { get; set; } = string.Empty;
+        public string OutputExcelFiles { get; set; } = string.Empty;
+        public string SpecialExcelFiles { get; set; } = string.Empty;
+        public string LogFiles { get; set; } = string.Empty;
         public string TempFiles { get; set; } = string.Empty;
-        public string ConfigFiles { get; set; } = string.Empty;
     }
 
     /// <summary>

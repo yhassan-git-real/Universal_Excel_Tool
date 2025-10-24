@@ -74,6 +74,20 @@ cd ..
 echo [SUCCESS] ETL_DynamicTableManager built successfully!
 echo.
 
+:: Build UniversalExcelTool.UI
+echo [INFO] Building UniversalExcelTool.UI (Modern UI Application)...
+cd UniversalExcelTool.UI
+dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:PublishTrimmed=false
+if %ERRORLEVEL% NEQ 0 (
+    echo [ERROR] UniversalExcelTool.UI build failed!
+    cd ..
+    pause
+    exit /b 1
+)
+cd ..
+echo [SUCCESS] UniversalExcelTool.UI built successfully!
+echo.
+
 echo ================================================================
 echo                    BUILD COMPLETED SUCCESSFULLY
 echo ================================================================
@@ -83,6 +97,7 @@ echo         Core\bin\Release\net8.0\win-x64\publish\UniversalExcelTool.exe
 echo         ETL_Excel\bin\Release\net8.0\win-x64\publish\ETL_Excel.exe
 echo         ETL_ExcelToDatabase\bin\Release\net8.0\win-x64\publish\ETL_ExcelToDatabase.exe
 echo         ETL_DynamicTableManager\bin\Release\net8.0\win-x64\publish\ETL_DynamicTableManager.exe
+echo         UniversalExcelTool.UI\bin\Release\net8.0\win-x64\publish\UniversalExcelTool.UI.exe
 echo.
 echo [INFO] These applications can now run on any Windows x64 machine
 echo        without requiring .NET runtime installation!
