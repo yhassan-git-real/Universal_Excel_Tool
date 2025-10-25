@@ -13,7 +13,7 @@ Write-Host ""
 $desktopPath = [Environment]::GetFolderPath("Desktop")
 
 # Get the executable path
-$exePath = Join-Path $PSScriptRoot "bin\Release\net8.0\win-x64\publish\UniversalExcelTool.UI.exe"
+$exePath = Join-Path $PSScriptRoot "bin\Release\net8.0\win-x64\UniversalExcelTool.UI.exe"
 
 # Check if executable exists
 if (-not (Test-Path $exePath)) {
@@ -36,7 +36,7 @@ $Shortcut.Description = "Universal Excel Tool - Modern ETL Manager"
 $Shortcut.WindowStyle = 1  # Normal window
 $Shortcut.Save()
 
-Write-Host "✓ Desktop shortcut created successfully!" -ForegroundColor Green
+Write-Host "[SUCCESS] Desktop shortcut created successfully!" -ForegroundColor Green
 Write-Host ""
 Write-Host "Shortcut location: $shortcutPath" -ForegroundColor White
 Write-Host "Target: $exePath" -ForegroundColor Gray
