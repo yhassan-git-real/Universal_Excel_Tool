@@ -1,8 +1,10 @@
 ﻿using ETL_Excel.Models;
 using ClosedXML.Excel;
+using ExcelDataReader;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using System.Data;
 
 namespace ETL_Excel.Modules
 {
@@ -13,40 +15,55 @@ namespace ETL_Excel.Modules
 
         public static async Task<(int totalSheets, int processedSheets, int errors, int specialSheetsMoved)> ProcessExcelFileAsync(string filePath, int totalFiles, int currentFileIndex, ConsoleLogger consoleLogger)
         {
+            // Register encoding provider for ExcelDataReader
+            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+
             int totalSheets = 0;
             int processedSheets = 0;
             int errors = 0;
 
             try
             {
-                using (var workbook = new XLWorkbook(filePath))
+                // Use ExcelDataReader for fast reading
+                using var stream = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                using var reader = ExcelReaderFactory.CreateReader(stream);
+                
+                var dataSetConfig = new ExcelDataSetConfiguration
                 {
-                    totalSheets = workbook.Worksheets.Count;
-
-                    for (int i = 1; i <= totalSheets; i++)
+                    ConfigureDataTable = (_) => new ExcelDataTableConfiguration
                     {
-                        var worksheet = workbook.Worksheet(i);
-                        string fileInfo = ConsoleHelper.GetFileInfo(Path.GetFileName(filePath), i, totalSheets);
-                        consoleLogger.CaptureConsoleOutput(fileInfo, true);
+                        UseHeaderRow = false // We'll handle headers manually
+                    }
+                };
 
-                        var isProcessed = await SplitSheetAsync(filePath, worksheet, consoleLogger);
+                var dataSet = reader.AsDataSet(dataSetConfig);
+                totalSheets = dataSet.Tables.Count;
 
-                        if (isProcessed)
-                        {
-                            processedSheets++;
-                        }
-                        else
-                        {
-                            errors++;
-                        }
+                for (int i = 0; i < totalSheets; i++)
+                {
+                    var dataTable = dataSet.Tables[i];
+                    string sheetName = dataTable.TableName;
+                    string fileInfo = ConsoleHelper.GetFileInfo(Path.GetFileName(filePath), i + 1, totalSheets);
+                    consoleLogger.CaptureConsoleOutput(fileInfo, true);
 
-                        if (i % 10 == 0 || i == totalSheets) // Update progress less frequently
-                        {
-                            string progress = ConsoleHelper.GetProgress(currentFileIndex, totalFiles, i, totalSheets, (double)i / totalSheets);
-                            consoleLogger.CaptureConsoleOutput(progress);
-                        }
+                    var isProcessed = await SplitSheetAsync(filePath, dataTable, sheetName, i + 1, consoleLogger);
+
+                    if (isProcessed)
+                    {
+                        processedSheets++;
+                    }
+                    else
+                    {
+                        errors++;
+                    }
+
+                    if ((i + 1) % 10 == 0 || (i + 1) == totalSheets) // Update progress less frequently
+                    {
+                        string progress = ConsoleHelper.GetProgress(currentFileIndex, totalFiles, i + 1, totalSheets, (double)(i + 1) / totalSheets);
+                        consoleLogger.CaptureConsoleOutput(progress);
                     }
                 }
+                
                 LogManager.LogSuccess($"Processed file: {filePath}");
             }
             catch (Exception ex)
@@ -58,20 +75,23 @@ namespace ETL_Excel.Modules
             return (totalSheets, processedSheets, errors, specialSheetsMoved);
         }
 
-        private static async Task<bool> SplitSheetAsync(string sourceFilePath, IXLWorksheet sourceWorksheet, ConsoleLogger consoleLogger)
+        private static async Task<bool> SplitSheetAsync(string sourceFilePath, DataTable sheetData, string sheetName, int sheetPosition, ConsoleLogger consoleLogger)
         {
             try
             {
-                string outputFolder = DetermineOutputFolder(sourceWorksheet.Name, _config);
+                string outputFolder = DetermineOutputFolder(sheetName, _config);
                 string outputFilePath = Path.Combine(outputFolder,
-                    $"{Path.GetFileNameWithoutExtension(sourceFilePath)}_{sourceWorksheet.Name}_{sourceWorksheet.Position:D2}.xlsx");
+                    $"{Path.GetFileNameWithoutExtension(sourceFilePath)}_{sheetName}_{sheetPosition:D2}.xlsx");
 
                 outputFilePath = FileManager.PrepareOutputFile(outputFilePath, consoleLogger);
 
+                // Use ClosedXML only for writing the small individual sheet
                 using (var destWorkbook = new XLWorkbook())
                 {
-                    var destWorksheet = destWorkbook.Worksheets.Add(sourceWorksheet.Name);
-                    CopySheetData(sourceWorksheet, destWorksheet);
+                    var destWorksheet = destWorkbook.Worksheets.Add(sheetName);
+                    
+                    // Copy data from DataTable to worksheet (data only, no formatting)
+                    CopyDataTableToWorksheet(sheetData, destWorksheet);
 
                     // Configure workbook settings
                     destWorkbook.CalculateMode = XLCalculateMode.Manual;
@@ -83,8 +103,8 @@ namespace ETL_Excel.Modules
                     throw new Exception($"Failed to create output file: {outputFilePath}");
                 }
 
-                string sheetInfo = ConsoleHelper.GetSheetInfo(sourceWorksheet.Name, sourceWorksheet.RowsUsed().Count(),
-                    sourceWorksheet.ColumnsUsed().Count(), Path.GetFileName(outputFilePath));
+                string sheetInfo = ConsoleHelper.GetSheetInfo(sheetName, sheetData.Rows.Count,
+                    sheetData.Columns.Count, Path.GetFileName(outputFilePath));
                 consoleLogger.CaptureConsoleOutput(sheetInfo, true);
                 LogManager.LogSuccess($"Created file: {outputFilePath}");
 
@@ -98,81 +118,51 @@ namespace ETL_Excel.Modules
             }
             catch (Exception ex)
             {
-                LogManager.LogError($"Error processing sheet {sourceWorksheet.Name}: {ex.Message}");
+                LogManager.LogError($"Error processing sheet {sheetName}: {ex.Message}");
                 return false;
             }
         }
 
-        private static void CopySheetData(IXLWorksheet source, IXLWorksheet destination)
+        private static void CopyDataTableToWorksheet(DataTable source, IXLWorksheet destination)
         {
             try
             {
-                LogManager.LogSuccess($"Starting to copy sheet: {source.Name}");
+                if (source == null || source.Rows.Count == 0)
+                    return;
 
-                var usedRange = source.RangeUsed();
-                if (usedRange == null) return;
-
-                // First, copy all values and styles to maintain data integrity
-                foreach (var row in usedRange.Rows())
+                // Copy data row by row (values only, no formatting overhead)
+                for (int rowIndex = 0; rowIndex < source.Rows.Count; rowIndex++)
                 {
-                    foreach (var cell in row.Cells())
+                    var sourceRow = source.Rows[rowIndex];
+                    
+                    for (int colIndex = 0; colIndex < source.Columns.Count; colIndex++)
                     {
-                        var destCell = destination.Cell(cell.Address);
-
-                        // Check if the cell starts with a formula indicator
-                        var cellValue = cell.GetString().Trim();
-                        if (cellValue.StartsWith("="))
+                        var cellValue = sourceRow[colIndex];
+                        var destCell = destination.Cell(rowIndex + 1, colIndex + 1);
+                        
+                        if (cellValue == null || cellValue == DBNull.Value)
                         {
-                            try
-                            {
-                                // Only try to copy as formula if it actually starts with '='
-                                destCell.FormulaA1 = cell.FormulaA1;
-                            }
-                            catch
-                            {
-                                // If formula fails, just copy the value as text
-                                destCell.Value = cellValue;
-                            }
+                            destCell.Value = string.Empty;
                         }
                         else
                         {
-                            // For non-formula cells, copy the value directly
-                            destCell.Value = cell.Value;
+                            // Set value directly without style copying
+                            destCell.Value = cellValue.ToString();
                         }
+                    }
 
-                        // Copy the cell style
-                        destCell.Style = cell.Style;
+                    // Progress logging for very large sheets
+                    if (rowIndex > 0 && rowIndex % 100000 == 0)
+                    {
+                        LogManager.LogSuccess($"Writing progress: {rowIndex:N0} rows written");
                     }
                 }
 
-                // Copy column widths to maintain sheet formatting
-                foreach (var column in source.ColumnsUsed())
-                {
-                    destination.Column(column.ColumnNumber()).Width = column.Width;
-                }
-
-                // Copy essential worksheet settings
-                destination.SheetView.ZoomScale = source.SheetView.ZoomScale;
-                destination.PageSetup.PaperSize = source.PageSetup.PaperSize;
-                destination.PageSetup.PageOrientation = source.PageSetup.PageOrientation;
-
-                // Copy print settings
-                try
-                {
-                    destination.PageSetup.Scale = source.PageSetup.Scale;
-                    destination.PageSetup.PagesWide = source.PageSetup.PagesWide;
-                    destination.PageSetup.PagesTall = source.PageSetup.PagesTall;
-                }
-                catch (Exception ex)
-                {
-                    LogManager.LogError($"Warning: Could not copy print settings: {ex.Message}");
-                }
-
-                LogManager.LogSuccess($"Finished copying sheet: {source.Name}");
+                LogManager.LogSuccess($"Finished copying sheet with {source.Rows.Count:N0} rows");
             }
             catch (Exception ex)
             {
-                LogManager.LogError($"Error in CopySheetData: {ex.Message}");
+                LogManager.LogError($"Error in CopyDataTableToWorksheet: {ex.Message}");
                 throw;
             }
         }

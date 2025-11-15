@@ -84,7 +84,7 @@ namespace ETL_ExcelToDatabase
         {
             Console.WriteLine();
             Console.WriteLine("╔═══════════════════════════════════════════════════════════════╗");
-            Console.WriteLine("║                   ETL CONFIGURATION SUMMARY                  ║");
+            Console.WriteLine("║                   ETL CONFIGURATION SUMMARY                   ║");
             Console.WriteLine("╚═══════════════════════════════════════════════════════════════╝");
             Console.WriteLine($"Database Server: {dbConfig.Server}");
             Console.WriteLine($"Database: {dbConfig.Database}");
@@ -213,7 +213,7 @@ namespace ETL_ExcelToDatabase
             {
                 Console.WriteLine();
                 Console.WriteLine("╔═══════════════════════════════════════════════════════════════╗");
-                Console.WriteLine("║                    TABLE CREATION SUMMARY                    ║");
+                Console.WriteLine("║                    TABLE CREATION SUMMARY                     ║");
                 Console.WriteLine("╚═══════════════════════════════════════════════════════════════╝");
                 ConsoleLogger.LogInfo("table", "Dynamic configuration indicates new table should be created");
                 

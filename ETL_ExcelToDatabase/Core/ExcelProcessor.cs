@@ -1,5 +1,6 @@
-﻿using ClosedXML.Excel;
+﻿using ExcelDataReader;
 using System.Data;
+using System.Text;
 using Microsoft.Data.SqlClient;
 using ETL_ExcelToDatabase.Models;
 using ETL_ExcelToDatabase.Services;
@@ -15,38 +16,51 @@ namespace ETL_ExcelToDatabase.Core
     int batchSize,
     string defaultSheetName)
         {
-            using var workbook = new XLWorkbook(excelFilePath);
-            var worksheet = !string.IsNullOrEmpty(defaultSheetName) && workbook.Worksheets.Contains(defaultSheetName)
-                ? workbook.Worksheet(defaultSheetName)
-                : workbook.Worksheet(1);
+            // Register encoding provider for ExcelDataReader
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
-            ConsoleLogger.LogInfo("file", $"Processing sheet: {worksheet.Name}");
+            using var stream = File.Open(excelFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            using var reader = ExcelReaderFactory.CreateReader(stream);
 
-            var usedRange = worksheet.RangeUsed();
-            if (usedRange == null)
+            // Move to first sheet
+            if (reader == null)
             {
                 throw new ArgumentException("Excel file is empty.");
             }
 
-            var headers = usedRange.FirstRow()
-                .CellsUsed()
-                .Select(cell => cell.Value.ToString())
-                .ToArray();
+            ConsoleLogger.LogInfo("file", $"Processing sheet: {reader.Name}");
+
+            // Read header row
+            if (!reader.Read())
+            {
+                throw new ArgumentException("Excel file has no header row.");
+            }
+
+            var headers = new string[reader.FieldCount];
+            for (int i = 0; i < reader.FieldCount; i++)
+            {
+                headers[i] = reader.GetValue(i)?.ToString() ?? $"Column_{i + 1}";  
+            }
 
             var currentBatch = CreateDataTable(headers);
             bool isFirstBatch = true;
-            int totalRows = usedRange.RowCount() - 1;
             int processedRows = 0;
+            int totalRows = 0;
 
-            // Process each row after the header
-            foreach (var row in worksheet.RowsUsed().Skip(1))
+            // Count total rows for progress reporting (approximate)
+            var currentPosition = stream.Position;
+            while (reader.Read()) totalRows++;
+            stream.Position = currentPosition;
+            reader.Reset();
+            reader.Read(); // Skip header again
+
+            // Process data rows
+            while (reader.Read())
             {
-                if (row.IsEmpty()) continue;
-
                 bool rowProcessedSuccessfully = true;
                 try
-                {
-                    ProcessExcelRow(row, currentBatch, headers.Length);
+                {  
+                    ProcessExcelDataReaderRow(reader, currentBatch, headers.Length);
                     processedRows++;
 
                     if (processedRows % 50000 == 0)
@@ -62,11 +76,11 @@ namespace ETL_ExcelToDatabase.Core
                         connection,
                         errorTableName,
                         Path.GetFileName(excelFilePath),
-                        $"Row {row.RowNumber()}",
+                        $"Row {processedRows + 2}", // +2 because of 0-index and header
                         "Data Processing Error",
                         ex.Message);
 
-                    ConsoleLogger.LogError($"Error processing row {row.RowNumber()}: {ex.Message}");
+                    ConsoleLogger.LogError($"Error processing row {processedRows + 2}: {ex.Message}");
                 }
 
                 // Only check batch size if row was processed successfully
@@ -108,32 +122,34 @@ namespace ETL_ExcelToDatabase.Core
             return dt;
         }
 
-        private static void ProcessExcelRow(IXLRow row, DataTable dt, int expectedColumnCount)
+        private static void ProcessExcelDataReaderRow(IExcelDataReader reader, DataTable dt, int expectedColumnCount)
         {
             DataRow dataRow = dt.NewRow();
 
             // Process each cell in the row
             for (int i = 0; i < expectedColumnCount; i++)
             {
-                var cell = row.Cell(i + 1);
-                dataRow[i] = GetCellValue(cell);
+                dataRow[i] = GetCellValueFromReader(reader, i);
             }
 
             dt.Rows.Add(dataRow);
         }
 
-        private static object GetCellValue(IXLCell cell)
+        private static object GetCellValueFromReader(IExcelDataReader reader, int columnIndex)
         {
-            if (cell.IsEmpty())
+            var value = reader.GetValue(columnIndex);
+            
+            if (value == null || value == DBNull.Value)
                 return DBNull.Value;
 
             // Convert Excel values to appropriate string representations
-            return cell.DataType switch
+            return value switch
             {
-                XLDataType.DateTime => cell.GetDateTime().ToString("yyyy-MM-dd HH:mm:ss"),
-                XLDataType.Number => cell.GetDouble().ToString(System.Globalization.CultureInfo.InvariantCulture),
-                XLDataType.Boolean => cell.GetBoolean().ToString(),
-                _ => cell.GetString().Trim()
+                DateTime dt => dt.ToString("yyyy-MM-dd HH:mm:ss"),
+                double d => d.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                decimal dec => dec.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                bool b => b.ToString(),
+                _ => value.ToString()?.Trim() ?? string.Empty
             };
         }
     }

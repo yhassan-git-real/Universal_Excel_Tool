@@ -19,8 +19,8 @@ namespace ETL_ExcelToDatabase.Core
 
             // Error log table creation query with simplified structure
             string createErrorTableQuery = $@"
-                IF OBJECT_ID('{errorTableName}', 'U') IS NULL
-                CREATE TABLE {errorTableName} (
+                IF OBJECT_ID('[{errorTableName}]', 'U') IS NULL
+                CREATE TABLE [{errorTableName}] (
                     ID INT IDENTITY(1,1) PRIMARY KEY,
                     FileName NVARCHAR(MAX),
                     ColumnName NVARCHAR(MAX),
@@ -31,8 +31,8 @@ namespace ETL_ExcelToDatabase.Core
 
             // Success log table creation query
             string createSuccessTableQuery = $@"
-            IF OBJECT_ID('{successLogTableName}', 'U') IS NULL
-                CREATE TABLE {successLogTableName} (
+            IF OBJECT_ID('[{successLogTableName}]', 'U') IS NULL
+                CREATE TABLE [{successLogTableName}] (
                     ID INT IDENTITY(1,1) PRIMARY KEY,
                     Message NVARCHAR(MAX),
                     TotalRows BIGINT,
@@ -152,8 +152,8 @@ namespace ETL_ExcelToDatabase.Core
 
             StringBuilder sql = new();
             sql.AppendLine("SET NOCOUNT ON;");
-            sql.AppendLine($"IF OBJECT_ID('{tempTableName}', 'U') IS NOT NULL DROP TABLE {tempTableName};");
-            sql.Append($"CREATE TABLE {tempTableName} (");
+            sql.AppendLine($"IF OBJECT_ID('[{tempTableName}]', 'U') IS NOT NULL DROP TABLE [{tempTableName}];");
+            sql.Append($"CREATE TABLE [{tempTableName}] (");
 
             // Create columns with cleaned names matching destination table format
             foreach (DataColumn column in dataTable.Columns)
@@ -193,7 +193,7 @@ namespace ETL_ExcelToDatabase.Core
                 SqlBulkCopyOptions.KeepNulls,
                 null)
             {
-                DestinationTableName = tempTableName,
+                DestinationTableName = $"[{tempTableName}]",
                 BatchSize = 100000,
                 BulkCopyTimeout = 0,
                 EnableStreaming = true,
@@ -247,9 +247,9 @@ namespace ETL_ExcelToDatabase.Core
                     validationResult.MatchedColumns.Select(c => $"[{c}]"));
 
                 string transferQuery = $@"
-            INSERT INTO {destinationTableName} ({matchedColumns})
+            INSERT INTO [{destinationTableName}] ({matchedColumns})
             SELECT {matchedColumns}
-            FROM {tempTableName}";
+            FROM [{tempTableName}]";
 
                 using var cmd = new SqlCommand(transferQuery, connection);
                 await cmd.ExecuteNonQueryAsync();
@@ -278,7 +278,7 @@ namespace ETL_ExcelToDatabase.Core
             string tableName)
         {
             using var cmd = new SqlCommand(
-                $"SELECT COUNT_BIG(*) FROM {tableName} WITH (NOLOCK)",
+                $"SELECT COUNT_BIG(*) FROM [{tableName}] WITH (NOLOCK)",
                 connection);
             return (long)await cmd.ExecuteScalarAsync();
         }
