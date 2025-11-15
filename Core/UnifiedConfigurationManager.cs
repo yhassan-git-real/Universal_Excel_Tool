@@ -174,6 +174,14 @@ namespace UniversalExcelTool.Core
         }
 
         /// <summary>
+        /// Gets the full path for input CSV files directory (raw/source CSV files)
+        /// </summary>
+        public string GetInputCsvFilesPath()
+        {
+            return ResolvePath(_config?.Paths.InputCsvFiles ?? throw new InvalidOperationException("InputCsvFiles path not configured"));
+        }
+
+        /// <summary>
         /// Gets the full path for output Excel files directory (regular processed files)
         /// </summary>
         public string GetOutputExcelFilesPath()
@@ -210,6 +218,7 @@ namespace UniversalExcelTool.Core
                 "dynamictablemanager" => _config.ExecutableModules.DynamicTableManager,
                 "excelprocessor" => _config.ExecutableModules.ExcelProcessor,
                 "databaseloader" => _config.ExecutableModules.DatabaseLoader,
+                "csvtodatabase" => _config.ExecutableModules.CsvToDatabase,
                 _ => throw new ArgumentException($"Unknown module: {moduleName}")
             };
 

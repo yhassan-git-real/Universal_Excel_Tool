@@ -329,7 +329,24 @@
                                    FontSize="11"
                                    Foreground="#6B7280"/>
                         <TextBox Text="{Binding InputExcelPath}"
-                                 Watermark="C:\Data\Excel\Input"
+                                 Watermark="E:\Files"
+                                 Height="32"
+                                 FontSize="12"
+                                 Padding="10,0"
+                                 VerticalContentAlignment="Center"/>
+                    </StackPanel>
+
+                    <!-- Input CSV Directory -->
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="Input CSV Directory" 
+                                   FontSize="13" 
+                                   FontWeight="Medium"
+                                   Foreground="#1A1A1A"/>
+                        <TextBlock Text="Location of CSV files to process"
+                                   FontSize="11"
+                                   Foreground="#6B7280"/>
+                        <TextBox Text="{Binding InputCsvPath}"
+                                 Watermark="E:\Files\CSV"
                                  Height="32"
                                  FontSize="12"
                                  Padding="10,0"
@@ -346,7 +363,7 @@
                                    FontSize="11"
                                    Foreground="#6B7280"/>
                         <TextBox Text="{Binding OutputCsvPath}"
-                                 Watermark="C:\Data\Excel\Output"
+                                 Watermark="E:\Files\ExcelFiles"
                                  Height="32"
                                  FontSize="12"
                                  Padding="10,0"

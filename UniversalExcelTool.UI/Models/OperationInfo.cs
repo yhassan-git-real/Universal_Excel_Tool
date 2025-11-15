@@ -67,6 +67,7 @@ namespace UniversalExcelTool.UI.Models
                 OperationType.CompleteETL => "🔄",
                 OperationType.ExcelProcessor => "📊",
                 OperationType.DatabaseLoader => "📤",
+                OperationType.CsvToDatabase => "📁",
                 _ => "⚙️"
             };
 
@@ -95,7 +96,8 @@ namespace UniversalExcelTool.UI.Models
         CompleteETL,
         ExcelProcessor,
         DatabaseLoader,
-        DynamicTableConfig
+        DynamicTableConfig,
+        CsvToDatabase
     }
 
     /// <summary>

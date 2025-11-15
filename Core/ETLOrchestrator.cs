@@ -174,28 +174,28 @@ namespace UniversalExcelTool.Core
         }
 
         /// <summary>
-        /// Runs only the CSV Loader module
+        /// Runs only the CSV to Database module
         /// </summary>
-        public async Task<bool> RunCsvLoaderAsync(ETLProcessOptions? options = null, CancellationToken cancellationToken = default)
+        public async Task<bool> RunCsvToDatabaseAsync(ETLProcessOptions? options = null, CancellationToken cancellationToken = default)
         {
             options ??= new ETLProcessOptions();
             
             LogInfo("═══════════════════════════════════════════════════════════════");
-            LogInfo("STEP 4: CSV Loading");
+            LogInfo("CSV to Database Processing");
             LogInfo("═══════════════════════════════════════════════════════════════");
 
             try
             {
-                string executablePath = _configManager.GetExecutablePath("csvloader");
-                var moduleInfo = _configManager.GetConfiguration().ExecutableModules.CsvLoader;
+                string executablePath = _configManager.GetExecutablePath("csvtodatabase");
+                var moduleInfo = _configManager.GetConfiguration().ExecutableModules.CsvToDatabase;
                 
-                string arguments = options.CsvLoaderArgs ?? moduleInfo.Arguments;
+                string arguments = options.CsvToDatabaseArgs ?? moduleInfo.Arguments;
                 
                 return await ExecuteModuleAsync(executablePath, arguments, moduleInfo.Name, cancellationToken);
             }
             catch (Exception ex)
             {
-                LogError($"Failed to run CSV Loader: {ex.Message}");
+                LogError($"Failed to run CSV to Database: {ex.Message}");
                 return false;
             }
         }
@@ -437,6 +437,6 @@ namespace UniversalExcelTool.Core
         public string? DynamicTableManagerArgs { get; set; }
         public string? ExcelProcessorArgs { get; set; }
         public string? DatabaseLoaderArgs { get; set; }
-        public string? CsvLoaderArgs { get; set; }
+        public string? CsvToDatabaseArgs { get; set; }
     }
 }
