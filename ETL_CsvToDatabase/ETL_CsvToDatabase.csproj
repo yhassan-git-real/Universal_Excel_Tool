@@ -19,6 +19,11 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
+  <!-- Reference Core project for UnifiedConfigurationManager -->
+  <ItemGroup>
+    <ProjectReference Include="..\Core\UniversalExcelTool.csproj" />
+  </ItemGroup>
+
   <!-- Include appsettings.json as content to be copied -->
   <ItemGroup>
     <None Include="..\appsettings.json" Link="appsettings.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
