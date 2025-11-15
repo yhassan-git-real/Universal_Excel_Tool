@@ -14,6 +14,7 @@ namespace UniversalExcelTool.Core
         public ProcessingConfig Processing { get; set; } = new();
         public LoggingConfig Logging { get; set; } = new();
         public TablesConfig Tables { get; set; } = new();
+        public NotificationsConfig Notifications { get; set; } = new();
     }
 
     /// <summary>
@@ -87,6 +88,10 @@ namespace UniversalExcelTool.Core
         public int RetryAttempts { get; set; } = 0;
         public int RetryDelaySeconds { get; set; } = 0;
         public List<string> SpecialSheetKeywords { get; set; } = new();
+        public int ChunkSize { get; set; } = 10000;
+        public int SaveInterval { get; set; } = 50000;
+        public int MemoryCleanupInterval { get; set; } = 5;
+        public int MaxDegreeOfParallelism { get; set; } = 1;
     }
 
     /// <summary>
@@ -109,6 +114,33 @@ namespace UniversalExcelTool.Core
         public string ErrorTableName { get; set; } = string.Empty;
         public string SuccessLogTableName { get; set; } = string.Empty;
         public bool AutoCreateLogTables { get; set; } = true;
+    }
+
+    /// <summary>
+    /// Notification settings for progress updates
+    /// </summary>
+    public class NotificationsConfig
+    {
+        public CsvNotificationSettings Csv { get; set; } = new();
+        public ExcelNotificationSettings Excel { get; set; } = new();
+    }
+
+    /// <summary>
+    /// CSV-specific notification settings
+    /// </summary>
+    public class CsvNotificationSettings
+    {
+        public bool EnableProgressNotifications { get; set; } = true;
+        public int ProgressNotificationInterval { get; set; } = 50000;
+    }
+
+    /// <summary>
+    /// Excel-specific notification settings
+    /// </summary>
+    public class ExcelNotificationSettings
+    {
+        public bool EnableProgressNotifications { get; set; } = true;
+        public int ProgressNotificationInterval { get; set; } = 50000;
     }
 
     /// <summary>

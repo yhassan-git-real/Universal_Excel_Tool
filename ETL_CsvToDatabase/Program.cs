@@ -165,7 +165,7 @@ namespace ETL_CsvToDatabase
                 InitialCatalog = config.Database,
                 IntegratedSecurity = config.IntegratedSecurity,
                 TrustServerCertificate = true,
-                ConnectTimeout = 600,
+                ConnectTimeout = config.ConnectionTimeout,
                 MultipleActiveResultSets = true,
                 MaxPoolSize = 100,
                 Encrypt = false
@@ -213,6 +213,12 @@ namespace ETL_CsvToDatabase
             {
                 throw new DirectoryNotFoundException($"CSV folder not found: {config.CsvFolderPath}");
             }
+
+            // Get notification settings from unified configuration
+            var configManager = UniversalExcelTool.Core.UnifiedConfigurationManager.Instance;
+            var unifiedConfig = configManager.GetConfiguration();
+            bool enableProgressNotifications = unifiedConfig.Notifications?.Csv?.EnableProgressNotifications ?? true;
+            int progressNotificationInterval = unifiedConfig.Notifications?.Csv?.ProgressNotificationInterval ?? 50000;
 
             string[] csvFiles = Directory.GetFiles(config.CsvFolderPath, "*.csv", SearchOption.TopDirectoryOnly)
                 .OrderBy(f => f, StringComparer.OrdinalIgnoreCase)
@@ -352,8 +358,9 @@ namespace ETL_CsvToDatabase
         {
             ConsoleLogger.LogInfo("table", $"Analyzing CSV file structure: {Path.GetFileName(csvFilePath)}");
             
+            // Get notification settings - disable notifications for sample read (only 1 row)
             // Read the first batch to determine column structure
-            var sampleData = CsvProcessor.LoadCsvInBatches(csvFilePath, connection, "", 1).FirstOrDefault();
+            var sampleData = CsvProcessor.LoadCsvInBatches(csvFilePath, connection, "", 1, false, 1).FirstOrDefault();
             
             if (sampleData?.Data == null || sampleData.Data.Columns.Count == 0)
             {
@@ -403,10 +410,16 @@ namespace ETL_CsvToDatabase
             stopwatch.Start();
             long totalRows = 0;
 
+            // Get notification settings from unified configuration
+            var configManager = UniversalExcelTool.Core.UnifiedConfigurationManager.Instance;
+            var unifiedConfig = configManager.GetConfiguration();
+            bool enableProgressNotifications = unifiedConfig.Notifications?.Csv?.EnableProgressNotifications ?? true;
+            int progressNotificationInterval = unifiedConfig.Notifications?.Csv?.ProgressNotificationInterval ?? 50000;
+
             try
             {
                 foreach (BatchResult dataBatch in CsvProcessor.LoadCsvInBatches(csvFile, connection,
-                    config.ErrorTableName, config.BatchSize))
+                    config.ErrorTableName, config.BatchSize, enableProgressNotifications, progressNotificationInterval))
                 {
                     if (dataBatch.IsFirstBatch && dataBatch.Data.Rows.Count > 0)
                     {
@@ -416,7 +429,7 @@ namespace ETL_CsvToDatabase
                     // Only load data if the batch contains rows
                     if (dataBatch.Data.Rows.Count > 0)
                     {
-                        await DatabaseOperations.LoadDataIntoTempTableAsync(connection, config.TempTableName, dataBatch.Data);
+                        await DatabaseOperations.LoadDataIntoTempTableAsync(connection, config.TempTableName, dataBatch.Data, progressNotificationInterval, config.BatchSize, enableProgressNotifications);
                     }
 
                     if (dataBatch.IsLastBatch)

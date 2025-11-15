@@ -14,7 +14,9 @@ namespace ETL_ExcelToDatabase.Core
     SqlConnection connection,
     string errorTableName,
     int batchSize,
-    string defaultSheetName)
+    string defaultSheetName,
+    bool enableProgressNotifications = true,
+    int progressNotificationInterval = 50000)
         {
             // Register encoding provider for ExcelDataReader
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
@@ -63,7 +65,7 @@ namespace ETL_ExcelToDatabase.Core
                     ProcessExcelDataReaderRow(reader, currentBatch, headers.Length);
                     processedRows++;
 
-                    if (processedRows % 50000 == 0)
+                    if (enableProgressNotifications && processedRows % progressNotificationInterval == 0)
                     {
                         ConsoleLogger.LogProgress("Processing Excel rows", processedRows, totalRows);
                     }

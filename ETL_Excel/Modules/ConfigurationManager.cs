@@ -48,11 +48,12 @@ namespace ETL_Excel.Modules
                     },
                     ProcessingSettings = new Models.ProcessingSettings
                     {
-                        ChunkSize = 10000,
-                        SaveInterval = 50000,
-                        MemoryCleanupInterval = 5,
-                        MaxDegreeOfParallelism = 1,
-                        BatchSize = unifiedConfig.Processing.BatchSize
+                        ChunkSize = unifiedConfig.Processing.ChunkSize,
+                        SaveInterval = unifiedConfig.Processing.SaveInterval,
+                        MemoryCleanupInterval = unifiedConfig.Processing.MemoryCleanupInterval,
+                        MaxDegreeOfParallelism = unifiedConfig.Processing.MaxDegreeOfParallelism,
+                        BatchSize = unifiedConfig.Processing.BatchSize,
+                        EnableProgressNotifications = unifiedConfig.Notifications?.Excel?.EnableProgressNotifications ?? true
                     }
                 };
             }

@@ -25,6 +25,7 @@ namespace ETL_DynamicTableManager.Models
         public bool IntegratedSecurity { get; set; } = true;
         public string Username { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
+        public int ConnectionTimeout { get; set; } = 600;
     }
 
     /// <summary>

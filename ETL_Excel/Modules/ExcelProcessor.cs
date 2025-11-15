@@ -152,7 +152,7 @@ namespace ETL_Excel.Modules
                     }
 
                     // Progress logging for very large sheets
-                    if (rowIndex > 0 && rowIndex % 100000 == 0)
+                    if (_config.ProcessingSettings.EnableProgressNotifications && rowIndex > 0 && rowIndex % _config.ProcessingSettings.SaveInterval == 0)
                     {
                         LogManager.LogSuccess($"Writing progress: {rowIndex:N0} rows written");
                     }
