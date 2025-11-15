@@ -23,5 +23,6 @@
         <converters:BoolToNotificationBorderConverter x:Key="BoolToNotificationBorderConverter"/>
         <converters:BoolToNotificationTextConverter x:Key="BoolToNotificationTextConverter"/>
         <converters:BoolToIconConverter x:Key="BoolToIconConverter"/>
+        <converters:StringEqualityConverter x:Key="StringEqualityConverter"/>
     </Application.Resources>
 </Application>

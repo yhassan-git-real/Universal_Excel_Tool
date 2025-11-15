@@ -183,6 +183,33 @@ namespace UniversalExcelTool.UI.ViewModels
         }
 
         /// <summary>
+        /// Runs only the CSV to Database module
+        /// </summary>
+        public async Task<bool> RunCsvToDatabaseAsync(ETLProcessOptions? options = null, CancellationToken cancellationToken = default)
+        {
+            options ??= new ETLProcessOptions();
+
+            _logger.LogInfo("═══════════════════════════════════════════════════════════════", "etl");
+            _logger.LogInfo("CSV to Database Processing", "etl");
+            _logger.LogInfo("═══════════════════════════════════════════════════════════════", "etl");
+
+            try
+            {
+                string executablePath = _configManager.GetExecutablePath("csvtodatabase");
+                var moduleInfo = _configManager.GetConfiguration().ExecutableModules.CsvToDatabase;
+
+                string arguments = options.CsvToDatabaseArgs ?? moduleInfo.Arguments;
+
+                return await ExecuteModuleAsync(executablePath, arguments, moduleInfo.Name, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Failed to run CSV to Database: {ex.Message}");
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Executes a module with the specified parameters
         /// </summary>
         private async Task<bool> ExecuteModuleAsync(string executablePath, string arguments, string moduleName, CancellationToken cancellationToken = default)

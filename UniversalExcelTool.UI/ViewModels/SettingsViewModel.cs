@@ -53,6 +53,9 @@ namespace UniversalExcelTool.UI.ViewModels
         private string _inputExcelPath = string.Empty;
 
         [ObservableProperty]
+        private string _inputCsvPath = string.Empty;
+
+        [ObservableProperty]
         private string _outputCsvPath = string.Empty;
 
         [ObservableProperty]
@@ -122,9 +125,10 @@ namespace UniversalExcelTool.UI.ViewModels
 
                 // Load paths
                 var pathsConfig = _currentConfig["Paths"];
-                InputExcelPath = pathsConfig?["InputExcelDirectory"]?.ToString() ?? string.Empty;
-                OutputCsvPath = pathsConfig?["OutputCsvDirectory"]?.ToString() ?? string.Empty;
-                LogsPath = pathsConfig?["LogsDirectory"]?.ToString() ?? string.Empty;
+                InputExcelPath = pathsConfig?["InputExcelFiles"]?.ToString() ?? string.Empty;
+                InputCsvPath = pathsConfig?["InputCsvFiles"]?.ToString() ?? string.Empty;
+                OutputCsvPath = pathsConfig?["OutputExcelFiles"]?.ToString() ?? string.Empty;
+                LogsPath = pathsConfig?["LogFiles"]?.ToString() ?? string.Empty;
 
                 // Load executable paths
                 var modulesConfig = _currentConfig["ExecutableModules"];
@@ -170,9 +174,10 @@ namespace UniversalExcelTool.UI.ViewModels
                 // Update paths
                 if (_currentConfig["Paths"] != null)
                 {
-                    _currentConfig["Paths"]!["InputExcelDirectory"] = InputExcelPath;
-                    _currentConfig["Paths"]!["OutputCsvDirectory"] = OutputCsvPath;
-                    _currentConfig["Paths"]!["LogsDirectory"] = LogsPath;
+                    _currentConfig["Paths"]!["InputExcelFiles"] = InputExcelPath;
+                    _currentConfig["Paths"]!["InputCsvFiles"] = InputCsvPath;
+                    _currentConfig["Paths"]!["OutputExcelFiles"] = OutputCsvPath;
+                    _currentConfig["Paths"]!["LogFiles"] = LogsPath;
                 }
 
                 // Update executable paths

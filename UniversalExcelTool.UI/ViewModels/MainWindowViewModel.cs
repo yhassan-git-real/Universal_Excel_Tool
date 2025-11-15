@@ -19,6 +19,7 @@ namespace UniversalExcelTool.UI.ViewModels
         private ExcelProcessorViewModel? _excelProcessorViewModel;
         private DatabaseLoaderViewModel? _databaseLoaderViewModel;
         private DynamicTableConfigViewModel? _dynamicTableConfigViewModel;
+        private CsvToDatabaseViewModel? _csvToDatabaseViewModel;
         private SettingsViewModel? _settingsViewModel;
 
         [ObservableProperty]
@@ -104,6 +105,19 @@ namespace UniversalExcelTool.UI.ViewModels
             CurrentPageIcon = "🗄️";
             CurrentPageTitle = "Database Loader";
             CurrentPageDescription = "Load processed data into database";
+        }
+
+        [RelayCommand]
+        private void NavigateToCsvToDatabase()
+        {
+            if (_csvToDatabaseViewModel == null)
+            {
+                _csvToDatabaseViewModel = new CsvToDatabaseViewModel();
+            }
+            CurrentViewModel = _csvToDatabaseViewModel;
+            CurrentPageIcon = "📁";
+            CurrentPageTitle = "CSV to Database";
+            CurrentPageDescription = "Process CSV files and load directly to database";
         }
 
         [RelayCommand]

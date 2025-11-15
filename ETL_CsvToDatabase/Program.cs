@@ -21,6 +21,35 @@ namespace ETL_CsvToDatabase
             {
                 ConsoleLogger.PrintHeader("1.0.0");
 
+                // Step 1: Run Dynamic Table Manager first for configuration
+                Console.WriteLine();
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("╔═══════════════════════════════════════════════════════════════╗");
+                Console.WriteLine("║             STEP 1: DYNAMIC TABLE CONFIGURATION               ║");
+                Console.WriteLine("║                  USER INPUT REQUIRED                          ║");
+                Console.WriteLine("╚═══════════════════════════════════════════════════════════════╝");
+                Console.ResetColor();
+                Console.WriteLine();
+                
+                bool configSuccess = await RunDynamicTableManagerAsync();
+                
+                if (!configSuccess)
+                {
+                    ConsoleLogger.LogError("Dynamic Table Manager failed or was cancelled");
+                    ConsoleLogger.LogError("Cannot proceed with CSV processing without table configuration");
+                    Console.WriteLine("\nPress any key to exit...");
+                    Console.ReadKey();
+                    return;
+                }
+                
+                Console.WriteLine();
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("╔═══════════════════════════════════════════════════════════════╗");
+                Console.WriteLine("║             STEP 2: CSV TO DATABASE PROCESSING                ║");
+                Console.WriteLine("╚═══════════════════════════════════════════════════════════════╝");
+                Console.ResetColor();
+                Console.WriteLine();
+
                 Console.WriteLine("⏳ Loading ETL system configuration...");
                 // Load configuration and initialize logging
                 (var dbConfig, var processConfig) = await InitializeConfigurationAsync();
@@ -489,6 +518,71 @@ namespace ETL_CsvToDatabase
             ConsoleLogger.LogError($"Error Type: {ex.GetType().Name}");
             ConsoleLogger.LogError($"Message: {ex.Message}");
             ConsoleLogger.LogError($"Stack Trace: {ex.StackTrace}");
+        }
+
+        private static async Task<bool> RunDynamicTableManagerAsync()
+        {
+            try
+            {
+                // Get the path to Dynamic Table Manager executable
+                string rootDir = Directory.GetCurrentDirectory();
+                string dynamicTableManagerPath = Path.Combine(rootDir, "..", "ETL_DynamicTableManager", "bin", "Debug", "net8.0", "ETL_DynamicTableManager.exe");
+                
+                // Also check Release build
+                if (!File.Exists(dynamicTableManagerPath))
+                {
+                    dynamicTableManagerPath = Path.Combine(rootDir, "..", "ETL_DynamicTableManager", "bin", "Release", "net8.0", "win-x64", "ETL_DynamicTableManager.exe");
+                }
+                
+                // Check published version
+                if (!File.Exists(dynamicTableManagerPath))
+                {
+                    dynamicTableManagerPath = Path.Combine(rootDir, "..", "ETL_DynamicTableManager", "bin", "Release", "net8.0", "win-x64", "publish", "ETL_DynamicTableManager.exe");
+                }
+
+                if (!File.Exists(dynamicTableManagerPath))
+                {
+                    ConsoleLogger.LogError($"Dynamic Table Manager executable not found");
+                    ConsoleLogger.LogError($"Expected location: {dynamicTableManagerPath}");
+                    ConsoleLogger.LogError("Please build the ETL_DynamicTableManager project first");
+                    return false;
+                }
+
+                ConsoleLogger.LogInfo("config", $"Launching Dynamic Table Manager: {dynamicTableManagerPath}");
+                ConsoleLogger.LogInfo("config", "Please configure the table settings in the window that opens...");
+
+                var startInfo = new ProcessStartInfo(dynamicTableManagerPath)
+                {
+                    UseShellExecute = true,
+                    WorkingDirectory = Path.GetDirectoryName(dynamicTableManagerPath)
+                };
+
+                using var process = Process.Start(startInfo);
+                if (process == null)
+                {
+                    ConsoleLogger.LogError("Failed to start Dynamic Table Manager process");
+                    return false;
+                }
+
+                // Wait for the process to complete
+                await process.WaitForExitAsync();
+
+                if (process.ExitCode == 0)
+                {
+                    ConsoleLogger.LogSuccess("Dynamic Table Manager completed successfully");
+                    return true;
+                }
+                else
+                {
+                    ConsoleLogger.LogError($"Dynamic Table Manager failed with exit code: {process.ExitCode}");
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                ConsoleLogger.LogError($"Error running Dynamic Table Manager: {ex.Message}");
+                return false;
+            }
         }
     }
 }
