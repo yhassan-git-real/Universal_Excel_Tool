@@ -74,6 +74,20 @@ cd ..
 echo [SUCCESS] ETL_DynamicTableManager built successfully!
 echo.
 
+:: Build ETL_CsvToDatabase
+echo [INFO] Building ETL_CsvToDatabase (CSV Loader)...
+cd ETL_CsvToDatabase
+dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:PublishTrimmed=false
+if %ERRORLEVEL% NEQ 0 (
+    echo [ERROR] ETL_CsvToDatabase build failed!
+    cd ..
+    pause
+    exit /b 1
+)
+cd ..
+echo [SUCCESS] ETL_CsvToDatabase built successfully!
+echo.
+
 :: Build UniversalExcelTool.UI
 echo [INFO] Building UniversalExcelTool.UI (Modern UI Application)...
 cd UniversalExcelTool.UI
@@ -96,6 +110,7 @@ echo [INFO] Self-contained executables created in:
 echo         Core\bin\Release\net8.0\win-x64\publish\UniversalExcelTool.exe
 echo         ETL_Excel\bin\Release\net8.0\win-x64\publish\ETL_Excel.exe
 echo         ETL_ExcelToDatabase\bin\Release\net8.0\win-x64\publish\ETL_ExcelToDatabase.exe
+echo         ETL_CsvToDatabase\bin\Release\net8.0\win-x64\publish\ETL_CsvToDatabase.exe
 echo         ETL_DynamicTableManager\bin\Release\net8.0\win-x64\publish\ETL_DynamicTableManager.exe
 echo         UniversalExcelTool.UI\bin\Release\net8.0\win-x64\publish\UniversalExcelTool.UI.exe
 echo.

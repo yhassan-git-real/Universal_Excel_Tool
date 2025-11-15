@@ -174,6 +174,33 @@ namespace UniversalExcelTool.Core
         }
 
         /// <summary>
+        /// Runs only the CSV Loader module
+        /// </summary>
+        public async Task<bool> RunCsvLoaderAsync(ETLProcessOptions? options = null, CancellationToken cancellationToken = default)
+        {
+            options ??= new ETLProcessOptions();
+            
+            LogInfo("═══════════════════════════════════════════════════════════════");
+            LogInfo("STEP 4: CSV Loading");
+            LogInfo("═══════════════════════════════════════════════════════════════");
+
+            try
+            {
+                string executablePath = _configManager.GetExecutablePath("csvloader");
+                var moduleInfo = _configManager.GetConfiguration().ExecutableModules.CsvLoader;
+                
+                string arguments = options.CsvLoaderArgs ?? moduleInfo.Arguments;
+                
+                return await ExecuteModuleAsync(executablePath, arguments, moduleInfo.Name, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                LogError($"Failed to run CSV Loader: {ex.Message}");
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Executes a module with the specified parameters
         /// </summary>
         private async Task<bool> ExecuteModuleAsync(string executablePath, string arguments, string moduleName, CancellationToken cancellationToken = default)
@@ -410,5 +437,6 @@ namespace UniversalExcelTool.Core
         public string? DynamicTableManagerArgs { get; set; }
         public string? ExcelProcessorArgs { get; set; }
         public string? DatabaseLoaderArgs { get; set; }
+        public string? CsvLoaderArgs { get; set; }
     }
 }
