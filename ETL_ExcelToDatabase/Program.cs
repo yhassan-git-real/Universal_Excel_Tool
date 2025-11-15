@@ -136,7 +136,7 @@ namespace ETL_ExcelToDatabase
                 InitialCatalog = config.Database,
                 IntegratedSecurity = config.IntegratedSecurity,
                 TrustServerCertificate = true,
-                ConnectTimeout = 600,
+                ConnectTimeout = config.ConnectionTimeout,
                 MultipleActiveResultSets = true,
                 MaxPoolSize = 100,
                 Encrypt = false
@@ -184,6 +184,12 @@ namespace ETL_ExcelToDatabase
             {
                 throw new DirectoryNotFoundException($"Excel folder not found: {config.ExcelFolderPath}");
             }
+
+            // Get notification settings from unified configuration
+            var configManager = UnifiedConfigurationManager.Instance;
+            var unifiedConfig = configManager.GetConfiguration();
+            bool enableProgressNotifications = unifiedConfig.Notifications?.Excel?.EnableProgressNotifications ?? true;
+            int progressNotificationInterval = unifiedConfig.Notifications?.Excel?.ProgressNotificationInterval ?? 50000;
 
             string[] excelFiles = Directory.GetFiles(config.ExcelFolderPath, "*.*")
                 .Where(f => f.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase) ||
@@ -319,8 +325,8 @@ namespace ETL_ExcelToDatabase
         {
             ConsoleLogger.LogInfo("table", $"Analyzing Excel file structure: {Path.GetFileName(excelFilePath)}");
             
-            // Read the first few rows to determine column structure
-            var sampleData = ExcelProcessor.LoadExcelInBatches(excelFilePath, connection, "", 1, "").FirstOrDefault();
+            // Read the first batch to determine column structure (disable notifications for sample)
+            var sampleData = ExcelProcessor.LoadExcelInBatches(excelFilePath, connection, "", 1, "", false, 1).FirstOrDefault();
             
             if (sampleData?.Data == null || sampleData.Data.Rows.Count == 0)
             {
@@ -362,17 +368,24 @@ namespace ETL_ExcelToDatabase
             stopwatch.Start();
             long totalRows = 0;
 
+            // Get notification settings from unified configuration
+            var configManager = UnifiedConfigurationManager.Instance;
+            var unifiedConfig = configManager.GetConfiguration();
+            bool enableProgressNotifications = unifiedConfig.Notifications?.Excel?.EnableProgressNotifications ?? true;
+            int progressNotificationInterval = unifiedConfig.Notifications?.Excel?.ProgressNotificationInterval ?? 50000;
+
             try
             {
                 foreach (BatchResult dataBatch in ExcelProcessor.LoadExcelInBatches(excelFile, connection,
-                    config.ErrorTableName, config.BatchSize, config.DefaultSheetName))
+                    config.ErrorTableName, config.BatchSize, config.DefaultSheetName, 
+                    enableProgressNotifications, progressNotificationInterval))
                 {
                     if (dataBatch.IsFirstBatch)
                     {
                         DatabaseOperations.DropAndCreateTempTable(connection, config.TempTableName, dataBatch.Data);
                     }
 
-                    await DatabaseOperations.LoadDataIntoTempTableAsync(connection, config.TempTableName, dataBatch.Data);
+                    await DatabaseOperations.LoadDataIntoTempTableAsync(connection, config.TempTableName, dataBatch.Data, progressNotificationInterval, config.BatchSize, enableProgressNotifications);
 
                     if (dataBatch.IsLastBatch)
                     {

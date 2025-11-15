@@ -15,10 +15,16 @@ namespace ETL_CsvToDatabase.Core
             string csvFilePath,
             SqlConnection connection,
             string errorTableName,
-            int batchSize)
+            int batchSize,
+            bool enableProgressNotifications = true,
+            int progressNotificationInterval = 50000)
         {
             // Validate CSV structure before processing
             ValidateCsvStructure(csvFilePath);
+
+            // Pre-count total rows for accurate progress reporting
+            long totalRows = CountCsvRows(csvFilePath);
+            ConsoleLogger.LogInfo("file", $"Total rows to process: {totalRows:N0}");
 
             // Configure CsvHelper
             var config = new CsvConfiguration(CultureInfo.InvariantCulture)
@@ -80,9 +86,9 @@ namespace ETL_CsvToDatabase.Core
                     ProcessCsvRow(csv, currentBatch, headers.Length);
                     processedRows++;
 
-                    if (processedRows % 50000 == 0)
+                    if (enableProgressNotifications && processedRows % progressNotificationInterval == 0)
                     {
-                        ConsoleLogger.LogProgress("Processing CSV rows", processedRows, processedRows);
+                        ConsoleLogger.LogProgress("Processing CSV rows", processedRows, totalRows);
                     }
                 }
                 catch (Exception ex)
@@ -130,6 +136,29 @@ namespace ETL_CsvToDatabase.Core
             }
 
             ConsoleLogger.LogSuccess($"Completed processing {processedRows:N0} rows");
+        }
+
+        private static long CountCsvRows(string csvFilePath)
+        {
+            long count = 0;
+            try
+            {
+                using var reader = new StreamReader(csvFilePath, Encoding.UTF8);
+                // Skip header
+                reader.ReadLine();
+                // Count data rows
+                while (!reader.EndOfStream)
+                {
+                    reader.ReadLine();
+                    count++;
+                }
+            }
+            catch (Exception ex)
+            {
+                ConsoleLogger.LogWarning($"Could not pre-count rows: {ex.Message}. Progress will show incremental count.");
+                return 0; // Return 0 to skip progress percentage calculation
+            }
+            return count;
         }
 
         public static void ValidateCsvStructure(string csvFilePath)

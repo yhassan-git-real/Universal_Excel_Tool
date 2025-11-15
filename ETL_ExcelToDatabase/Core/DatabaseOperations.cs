@@ -184,7 +184,10 @@ namespace ETL_ExcelToDatabase.Core
         public static async Task LoadDataIntoTempTableAsync(
             SqlConnection connection,
             string tempTableName,
-            DataTable dataTable)
+            DataTable dataTable,
+            int progressNotificationInterval = 50000,
+            int bulkCopyBatchSize = 100000,
+            bool enableProgressNotifications = true)
         {
             using SqlBulkCopy bulkCopy = new(
                 connection,
@@ -194,20 +197,23 @@ namespace ETL_ExcelToDatabase.Core
                 null)
             {
                 DestinationTableName = $"[{tempTableName}]",
-                BatchSize = 100000,
+                BatchSize = bulkCopyBatchSize,
                 BulkCopyTimeout = 0,
                 EnableStreaming = true,
-                NotifyAfter = 50000
+                NotifyAfter = progressNotificationInterval
             };
 
-            // Set up progress reporting
-            bulkCopy.SqlRowsCopied += (sender, e) =>
+            // Set up progress reporting only if enabled
+            if (enableProgressNotifications)
             {
-                ConsoleLogger.LogProgress(
-                    "Copying to temp table",
-                    e.RowsCopied,
-                    dataTable.Rows.Count);
-            };
+                bulkCopy.SqlRowsCopied += (sender, e) =>
+                {
+                    ConsoleLogger.LogProgress(
+                        "Copying to temp table",
+                        e.RowsCopied,
+                        dataTable.Rows.Count);
+                };
+            }
 
             // Set up column mappings from Excel names to cleaned database names
             foreach (DataColumn column in dataTable.Columns)

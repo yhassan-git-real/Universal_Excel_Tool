@@ -63,7 +63,7 @@ namespace ETL_DynamicTableManager.Configuration
                 InitialCatalog = config.Database,
                 IntegratedSecurity = config.IntegratedSecurity,
                 TrustServerCertificate = true,
-                ConnectTimeout = 600,
+                ConnectTimeout = config.ConnectionTimeout,
                 MultipleActiveResultSets = true,
                 MaxPoolSize = 100,
                 Encrypt = false

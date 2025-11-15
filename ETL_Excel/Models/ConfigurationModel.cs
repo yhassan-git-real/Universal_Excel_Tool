@@ -47,6 +47,7 @@ namespace ETL_Excel.Models
         public int MemoryCleanupInterval { get; set; }
         public int MaxDegreeOfParallelism { get; set; }
         public int BatchSize { get; set; }
+        public bool EnableProgressNotifications { get; set; } = true;
     }
 }
 

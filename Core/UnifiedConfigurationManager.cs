@@ -73,21 +73,29 @@ namespace UniversalExcelTool.Core
         }
 
         /// <summary>
-        /// Gets the path to the appsettings.json file
+        /// Gets the path to the appsettings.json file from the root project directory
         /// </summary>
         private string GetConfigurationFilePath()
         {
-            // First try to find it relative to the executing assembly
+            // Find the root project directory (where Core, ETL modules exist)
             string assemblyDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "";
-            
-            // Walk up directories to find appsettings.json
             string currentDir = assemblyDir;
+            
             for (int i = 0; i < 10; i++) // Limit search depth
             {
-                string configPath = Path.Combine(currentDir, "appsettings.json");
-                if (File.Exists(configPath))
+                // Check if this is the root project directory
+                bool hasCore = Directory.Exists(Path.Combine(currentDir, "Core"));
+                bool hasEtlModules = Directory.Exists(Path.Combine(currentDir, "ETL_CsvToDatabase")) ||
+                                    Directory.Exists(Path.Combine(currentDir, "ETL_Excel")) ||
+                                    Directory.Exists(Path.Combine(currentDir, "ETL_ExcelToDatabase"));
+                
+                if (hasCore && hasEtlModules)
                 {
-                    return configPath;
+                    string rootConfigPath = Path.Combine(currentDir, "appsettings.json");
+                    if (File.Exists(rootConfigPath))
+                    {
+                        return rootConfigPath;
+                    }
                 }
                 
                 string? parentDir = Path.GetDirectoryName(currentDir);
@@ -97,14 +105,7 @@ namespace UniversalExcelTool.Core
                 currentDir = parentDir;
             }
 
-            // If not found, try the current working directory
-            string workingDirConfig = Path.Combine(Environment.CurrentDirectory, "appsettings.json");
-            if (File.Exists(workingDirConfig))
-            {
-                return workingDirConfig;
-            }
-
-            throw new FileNotFoundException("appsettings.json not found in any parent directories");
+            throw new FileNotFoundException("appsettings.json not found in root project directory. Ensure the file exists in the directory containing Core and ETL modules.");
         }
 
         /// <summary>

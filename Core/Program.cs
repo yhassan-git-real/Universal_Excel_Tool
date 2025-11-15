@@ -201,7 +201,7 @@ namespace UniversalExcelTool
             Console.WriteLine("  UniversalExcelTool.exe --skip-dynamic-config");
             Console.WriteLine();
             Console.WriteLine("  # Update root directory for new environment");
-            Console.WriteLine("  UniversalExcelTool.exe --root-directory \"C:\\MyProject\\Universal_Excel_Tool\"");
+            Console.WriteLine("  UniversalExcelTool.exe --root-directory \"YOUR_PROJECT_PATH\"");
             Console.WriteLine();
             Console.WriteLine("  # Run only table configuration");
             Console.WriteLine("  UniversalExcelTool.exe --dynamic-table-only");
