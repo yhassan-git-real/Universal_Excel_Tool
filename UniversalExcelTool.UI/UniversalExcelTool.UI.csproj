@@ -35,24 +35,26 @@
 
   <ItemGroup>
     <!-- Reference Core DLL directly to avoid self-contained conflicts -->
-    <!-- Using Debug build DLL from Core project -->
+    <!-- Using Release build DLL from Core project -->
     <Reference Include="UniversalExcelTool">
-      <HintPath>..\Core\bin\Debug\net8.0\win-x64\UniversalExcelTool.dll</HintPath>
+      <HintPath>..\Core\bin\Release\net8.0\win-x64\UniversalExcelTool.dll</HintPath>
       <Private>true</Private>
     </Reference>
   </ItemGroup>
 
+  <!-- Copy appsettings.json from parent directory -->
   <ItemGroup>
-    <None Update="appsettings.json">
+    <None Include="..\appsettings.json" Link="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </None>
   </ItemGroup>
 
   <!-- Copy Core DLL and dependencies to output -->
   <Target Name="CopyCoreDependencies" AfterTargets="Build">
     <ItemGroup>
-      <CoreFiles Include="..\Core\bin\Debug\net8.0\win-x64\UniversalExcelTool.dll" />
-      <CoreFiles Include="..\Core\bin\Debug\net8.0\win-x64\UniversalExcelTool.pdb" />
+      <CoreFiles Include="..\Core\bin\Release\net8.0\win-x64\UniversalExcelTool.dll" />
+      <CoreFiles Include="..\Core\bin\Release\net8.0\win-x64\UniversalExcelTool.pdb" />
     </ItemGroup>
     <Copy SourceFiles="@(CoreFiles)" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
   </Target>

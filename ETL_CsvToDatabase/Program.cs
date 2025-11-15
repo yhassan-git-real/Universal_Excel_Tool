@@ -3,6 +3,7 @@ using Microsoft.Data.SqlClient;
 using ETL_CsvToDatabase.Core;
 using ETL_CsvToDatabase.Models;
 using ETL_CsvToDatabase.Services;
+using UniversalExcelTool.Core;
 
 namespace ETL_CsvToDatabase
 {
@@ -110,7 +111,7 @@ namespace ETL_CsvToDatabase
             }
         }
 
-        private static void PrintConfigurationSummary(DatabaseConfig dbConfig, ProcessConfig processConfig)
+        private static void PrintConfigurationSummary(ETL_CsvToDatabase.Core.DatabaseConfig dbConfig, ProcessConfig processConfig)
         {
             Console.WriteLine();
             Console.WriteLine("╔═══════════════════════════════════════════════════════════════╗");
@@ -127,7 +128,7 @@ namespace ETL_CsvToDatabase
             Console.WriteLine();
         }
 
-        private static async Task<(DatabaseConfig, ProcessConfig)> InitializeConfigurationAsync()
+        private static async Task<(ETL_CsvToDatabase.Core.DatabaseConfig, ProcessConfig)> InitializeConfigurationAsync()
         {
             string configPath = ConfigurationLoader.GetConfigPath();
             ConsoleLogger.LogInfo("config", $"Loading configuration from: {configPath}");
@@ -156,7 +157,7 @@ namespace ETL_CsvToDatabase
             return (appConfig.DatabaseConfig, processConfig);
         }
 
-        private static string BuildConnectionString(DatabaseConfig config)
+        private static string BuildConnectionString(ETL_CsvToDatabase.Core.DatabaseConfig config)
         {
             SqlConnectionStringBuilder builder = new()
             {
@@ -524,21 +525,9 @@ namespace ETL_CsvToDatabase
         {
             try
             {
-                // Get the path to Dynamic Table Manager executable
-                string rootDir = Directory.GetCurrentDirectory();
-                string dynamicTableManagerPath = Path.Combine(rootDir, "..", "ETL_DynamicTableManager", "bin", "Debug", "net8.0", "ETL_DynamicTableManager.exe");
-                
-                // Also check Release build
-                if (!File.Exists(dynamicTableManagerPath))
-                {
-                    dynamicTableManagerPath = Path.Combine(rootDir, "..", "ETL_DynamicTableManager", "bin", "Release", "net8.0", "win-x64", "ETL_DynamicTableManager.exe");
-                }
-                
-                // Check published version
-                if (!File.Exists(dynamicTableManagerPath))
-                {
-                    dynamicTableManagerPath = Path.Combine(rootDir, "..", "ETL_DynamicTableManager", "bin", "Release", "net8.0", "win-x64", "publish", "ETL_DynamicTableManager.exe");
-                }
+                // Get the path to Dynamic Table Manager executable using UnifiedConfigurationManager
+                var configManager = UniversalExcelTool.Core.UnifiedConfigurationManager.Instance;
+                string dynamicTableManagerPath = configManager.GetExecutablePath("dynamictablemanager");
 
                 if (!File.Exists(dynamicTableManagerPath))
                 {

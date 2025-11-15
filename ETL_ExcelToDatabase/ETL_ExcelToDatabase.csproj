@@ -23,10 +23,11 @@
   </ItemGroup>
   
   <!-- Copy appsettings.json from parent directory -->
-  <Target Name="CopyConfigFile" AfterTargets="Build">
-    <Copy SourceFiles="$(MSBuildProjectDirectory)\..\appsettings.json" 
-          DestinationFolder="$(OutputPath)" 
-          Condition="Exists('$(MSBuildProjectDirectory)\..\appsettings.json')" />
-  </Target>
+  <ItemGroup>
+    <None Include="..\appsettings.json" Link="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </None>
+  </ItemGroup>
 
 </Project>
