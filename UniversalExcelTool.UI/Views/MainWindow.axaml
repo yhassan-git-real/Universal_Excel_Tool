@@ -255,31 +255,19 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- Breadcrumb and Title -->
+                    <!-- Page Title -->
                     <StackPanel Grid.Column="0" 
                                VerticalAlignment="Center"
-                               Spacing="4">
-                        <!-- Breadcrumb -->
-                        <StackPanel Orientation="Horizontal" Spacing="6">
-                            <TextBlock Text="🏠" FontSize="11" Foreground="#000000" VerticalAlignment="Center"/>
-                            <TextBlock Text="/" FontSize="11" Foreground="#000000" VerticalAlignment="Center"/>
-                            <TextBlock Text="{Binding CurrentPageTitle}" 
-                                       FontSize="11" 
-                                       Foreground="#000000"
-                                       FontWeight="Medium"
-                                       VerticalAlignment="Center"/>
-                        </StackPanel>
-                        <!-- Page Title -->
-                        <StackPanel Orientation="Horizontal" Spacing="10">
-                            <TextBlock Text="{Binding CurrentPageIcon}" 
-                                       FontSize="18" 
-                                       VerticalAlignment="Center"/>
-                            <TextBlock Text="{Binding CurrentPageTitle}" 
-                                       FontSize="18" 
-                                       FontWeight="Bold"
-                                       Foreground="#1A1A1A"
-                                       VerticalAlignment="Center"/>
-                        </StackPanel>
+                               Orientation="Horizontal" 
+                               Spacing="10">
+                        <TextBlock Text="{Binding CurrentPageIcon}" 
+                                   FontSize="18" 
+                                   VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding CurrentPageTitle}" 
+                                   FontSize="18" 
+                                   FontWeight="Bold"
+                                   Foreground="#1A1A1A"
+                                   VerticalAlignment="Center"/>
                     </StackPanel>
 
                     <!-- Header Actions -->
