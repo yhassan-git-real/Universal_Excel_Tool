@@ -216,7 +216,7 @@
                 Background="White"
                 BorderThickness="0,0,0,1"
                 BorderBrush="#E5E7EB"
-                Height="60">
+                Height="68">
             <Grid ColumnDefinitions="220,*" Margin="0">
                 <!-- Logo Section in Header -->
                 <Border Grid.Column="0" 
@@ -224,32 +224,34 @@
                         BorderThickness="0,0,1,0"
                         BorderBrush="#E5E7EB">
                     <StackPanel Orientation="Horizontal" 
-                               Spacing="12" 
-                               Margin="20,0"
+                               Spacing="0" 
+                               Margin="16,0"
                                VerticalAlignment="Center">
-                        <Border Background="#78ffd6"
-                                CornerRadius="8"
-                                Width="36"
-                                Height="36">
-                            <TextBlock Text="📊" 
-                                       FontSize="20" 
-                                       HorizontalAlignment="Center"
-                                       VerticalAlignment="Center"/>
-                        </Border>
-                        <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="📑" 
+                                   FontSize="30" 
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,10,0"/>
+                        <StackPanel VerticalAlignment="Center" Spacing="3">
                             <TextBlock Text="Universal Excel Tool" 
                                        FontSize="13" 
                                        FontWeight="Bold"
-                                       Foreground="White"/>
+                                       Foreground="White"
+                                       LetterSpacing="0.1"
+                                       TextTrimming="None"
+                                       TextWrapping="NoWrap"/>
                             <TextBlock Text="Modern ETL Manager" 
-                                       FontSize="9" 
-                                       Foreground="#9BA3AE"/>
+                                       FontSize="10" 
+                                       FontWeight="SemiBold"
+                                       Foreground="#c5ecf3"
+                                       LetterSpacing="0.5"
+                                       TextTrimming="None"
+                                       TextWrapping="NoWrap"/>
                         </StackPanel>
                     </StackPanel>
                 </Border>
 
                 <!-- Page Title Section -->
-                <Grid Grid.Column="1" Margin="28,0">
+                <Grid Grid.Column="1" Margin="32,0,28,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
@@ -259,35 +261,36 @@
                     <StackPanel Grid.Column="0" 
                                VerticalAlignment="Center"
                                Orientation="Horizontal" 
-                               Spacing="10">
+                               Spacing="12">
                         <TextBlock Text="{Binding CurrentPageIcon}" 
-                                   FontSize="18" 
+                                   FontSize="22" 
                                    VerticalAlignment="Center"/>
                         <TextBlock Text="{Binding CurrentPageTitle}" 
-                                   FontSize="18" 
+                                   FontSize="20" 
                                    FontWeight="Bold"
-                                   Foreground="#1A1A1A"
+                                   Foreground="#111827"
+                                   LetterSpacing="0.2"
                                    VerticalAlignment="Center"/>
                     </StackPanel>
 
                     <!-- Header Actions -->
                     <StackPanel Grid.Column="1" 
                                Orientation="Horizontal" 
-                               Spacing="12"
+                               Spacing="14"
                                VerticalAlignment="Center">
                         <!-- System Time -->
                         <Border Background="#F9FAFB"
                                 BorderBrush="#E5E7EB"
                                 BorderThickness="1"
-                                CornerRadius="6"
-                                Padding="10,6">
-                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                <TextBlock Text="🕐" FontSize="12" VerticalAlignment="Center"/>
+                                CornerRadius="8"
+                                Padding="12,8">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBlock Text="🕐" FontSize="13" VerticalAlignment="Center"/>
                                 <TextBlock Text="{Binding CurrentTime, StringFormat='HH:mm:ss'}" 
-                                           FontSize="11"
+                                           FontSize="12"
                                            FontFamily="Consolas"
-                                           FontWeight="Medium"
-                                           Foreground="#6B7280"
+                                           FontWeight="SemiBold"
+                                           Foreground="#374151"
                                            VerticalAlignment="Center"/>
                             </StackPanel>
                         </Border>
@@ -295,13 +298,13 @@
                         <Border Background="#EEF2FF"
                                 BorderBrush="#C7D2FE"
                                 BorderThickness="1"
-                                CornerRadius="6"
-                                Padding="10,6">
-                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                <TextBlock Text="👤" FontSize="12" VerticalAlignment="Center"/>
+                                CornerRadius="8"
+                                Padding="12,8">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBlock Text="👤" FontSize="13" VerticalAlignment="Center"/>
                                 <TextBlock Text="{Binding UserName}" 
-                                           FontSize="11"
-                                           FontWeight="Medium"
+                                           FontSize="12"
+                                           FontWeight="SemiBold"
                                            Foreground="#4F46E5"
                                            VerticalAlignment="Center"/>
                             </StackPanel>
@@ -317,247 +320,374 @@
                 Background="#007991"
                 BorderThickness="0,0,1,0"
                 BorderBrush="#006577">
-            <StackPanel Margin="0,16">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="0,20,0,20">
 
-                <!-- Navigation Buttons -->
-                <StackPanel Margin="12,0">
-                    <Button Command="{Binding NavigateToDashboardCommand}"
-                            HorizontalAlignment="Stretch"
-                            HorizontalContentAlignment="Left"
-                            Padding="0"
-                            Margin="0,2"
-                            Background="Transparent"
-                            Foreground="White"
-                            BorderThickness="0"
-                            CornerRadius="6"
-                            Height="38"
-                            Cursor="Hand">
-                        <Grid ColumnDefinitions="Auto,*" Margin="12,0">
-                            <TextBlock Grid.Column="0" 
-                                       Text="📊" 
-                                       FontSize="16" 
-                                       VerticalAlignment="Center"
-                                       Margin="0,0,10,0"/>
-                            <TextBlock Grid.Column="1" 
-                                       Text="Dashboard" 
-                                       FontSize="13"
-                                       FontWeight="Medium"
-                                       VerticalAlignment="Center"/>
-                        </Grid>
-                        <Button.Styles>
-                            <Style Selector="Button:pointerover">
-                                <Setter Property="Background" Value="#78ffd6"/>
-                            </Style>
-                            <Style Selector="Button:pressed">
-                                <Setter Property="Background" Value="#4dd0ba"/>
-                            </Style>
-                        </Button.Styles>
-                    </Button>
+                    <!-- Main Navigation Section -->
+                    <TextBlock Text="MAIN MENU" 
+                               FontSize="11" 
+                               FontWeight="Bold"
+                               Foreground="#a8e6f0"
+                               Margin="20,0,0,12"
+                               LetterSpacing="1.2"/>
 
-                    <Button Command="{Binding NavigateToTableConfigCommand}"
-                            HorizontalAlignment="Stretch"
-                            HorizontalContentAlignment="Left"
-                            Padding="0"
-                            Margin="0,2"
-                            Background="Transparent"
-                            Foreground="White"
-                            BorderThickness="0"
-                            CornerRadius="6"
-                            Height="38"
-                            Cursor="Hand">
-                        <Grid ColumnDefinitions="Auto,*" Margin="12,0">
-                            <TextBlock Grid.Column="0" 
-                                       Text="🔧" 
-                                       FontSize="16" 
-                                       VerticalAlignment="Center"
-                                       Margin="0,0,10,0"/>
-                            <TextBlock Grid.Column="1" 
-                                       Text="Table Configuration" 
-                                       FontSize="13"
-                                       FontWeight="Medium"
-                                       VerticalAlignment="Center"/>
-                        </Grid>
-                        <Button.Styles>
-                            <Style Selector="Button:pointerover">
-                                <Setter Property="Background" Value="#78ffd6"/>
-                            </Style>
-                            <Style Selector="Button:pressed">
-                                <Setter Property="Background" Value="#4dd0ba"/>
-                            </Style>
-                        </Button.Styles>
-                    </Button>
+                    <!-- Navigation Buttons -->
+                    <StackPanel Margin="10,0">
+                        <!-- Dashboard -->
+                        <Button Command="{Binding NavigateToDashboardCommand}"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Left"
+                                Padding="12,10"
+                                Margin="0,0,0,6"
+                                Background="Transparent"
+                                Foreground="White"
+                                BorderThickness="0"
+                                CornerRadius="10"
+                                Height="48"
+                                Cursor="Hand">
+                            <Grid ColumnDefinitions="Auto,*,Auto">
+                                <Border Grid.Column="0"
+                                        Background="#0d9fb8"
+                                        CornerRadius="8"
+                                        Width="32"
+                                        Height="32"
+                                        VerticalAlignment="Center"
+                                        Margin="0,0,12,0">
+                                    <TextBlock Text="📊" 
+                                               FontSize="16" 
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                                </Border>
+                                <TextBlock Grid.Column="1" 
+                                           Text="Dashboard" 
+                                           FontSize="13.5"
+                                           FontWeight="Medium"
+                                           VerticalAlignment="Center"/>
+                                <Border Grid.Column="2"
+                                        Background="#78ffd6"
+                                        CornerRadius="4"
+                                        Width="4"
+                                        Height="24"
+                                        VerticalAlignment="Center"
+                                        Opacity="0"/>
+                            </Grid>
+                            <Button.Styles>
+                                <Style Selector="Button:pointerover">
+                                    <Setter Property="Background" Value="#0a8ca3"/>
+                                </Style>
+                                <Style Selector="Button:pressed">
+                                    <Setter Property="Background" Value="#0d9fb8"/>
+                                </Style>
+                            </Button.Styles>
+                        </Button>
 
-                    <Button Command="{Binding NavigateToExcelProcessorCommand}"
-                            HorizontalAlignment="Stretch"
-                            HorizontalContentAlignment="Left"
-                            Padding="0"
-                            Margin="0,2"
-                            Background="Transparent"
-                            Foreground="White"
-                            BorderThickness="0"
-                            CornerRadius="6"
-                            Height="38"
-                            Cursor="Hand">
-                        <Grid ColumnDefinitions="Auto,*" Margin="12,0">
-                            <TextBlock Grid.Column="0" 
-                                       Text="📄" 
-                                       FontSize="16" 
-                                       VerticalAlignment="Center"
-                                       Margin="0,0,10,0"/>
-                            <TextBlock Grid.Column="1" 
-                                       Text="Excel Processor" 
-                                       FontSize="13"
-                                       FontWeight="Medium"
-                                       VerticalAlignment="Center"/>
-                        </Grid>
-                        <Button.Styles>
-                            <Style Selector="Button:pointerover">
-                                <Setter Property="Background" Value="#78ffd6"/>
-                            </Style>
-                            <Style Selector="Button:pressed">
-                                <Setter Property="Background" Value="#4dd0ba"/>
-                            </Style>
-                        </Button.Styles>
-                    </Button>
+                        <!-- Table Configuration -->
+                        <Button Command="{Binding NavigateToTableConfigCommand}"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Left"
+                                Padding="12,10"
+                                Margin="0,0,0,6"
+                                Background="Transparent"
+                                Foreground="White"
+                                BorderThickness="0"
+                                CornerRadius="10"
+                                Height="48"
+                                Cursor="Hand">
+                            <Grid ColumnDefinitions="Auto,*,Auto">
+                                <Border Grid.Column="0"
+                                        Background="#0d9fb8"
+                                        CornerRadius="8"
+                                        Width="32"
+                                        Height="32"
+                                        VerticalAlignment="Center"
+                                        Margin="0,0,12,0">
+                                    <TextBlock Text="🔧" 
+                                               FontSize="16" 
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                                </Border>
+                                <TextBlock Grid.Column="1" 
+                                           Text="Table Configuration" 
+                                           FontSize="13.5"
+                                           FontWeight="Medium"
+                                           VerticalAlignment="Center"
+                                           TextWrapping="NoWrap"/>
+                                <Border Grid.Column="2"
+                                        Background="#78ffd6"
+                                        CornerRadius="4"
+                                        Width="4"
+                                        Height="24"
+                                        VerticalAlignment="Center"
+                                        Opacity="0"/>
+                            </Grid>
+                            <Button.Styles>
+                                <Style Selector="Button:pointerover">
+                                    <Setter Property="Background" Value="#0a8ca3"/>
+                                </Style>
+                                <Style Selector="Button:pressed">
+                                    <Setter Property="Background" Value="#0d9fb8"/>
+                                </Style>
+                            </Button.Styles>
+                        </Button>
 
-                    <Button Command="{Binding NavigateToDatabaseLoaderCommand}"
-                            HorizontalAlignment="Stretch"
-                            HorizontalContentAlignment="Left"
-                            Padding="0"
-                            Margin="0,2"
-                            Background="Transparent"
-                            Foreground="White"
-                            BorderThickness="0"
-                            CornerRadius="6"
-                            Height="38"
-                            Cursor="Hand">
-                        <Grid ColumnDefinitions="Auto,*" Margin="12,0">
-                            <TextBlock Grid.Column="0" 
-                                       Text="🗄️" 
-                                       FontSize="16" 
-                                       VerticalAlignment="Center"
-                                       Margin="0,0,10,0"/>
-                            <TextBlock Grid.Column="1" 
-                                       Text="Database Loader" 
-                                       FontSize="13"
-                                       FontWeight="Medium"
-                                       VerticalAlignment="Center"/>
-                        </Grid>
-                        <Button.Styles>
-                            <Style Selector="Button:pointerover">
-                                <Setter Property="Background" Value="#78ffd6"/>
-                            </Style>
-                            <Style Selector="Button:pressed">
-                                <Setter Property="Background" Value="#4dd0ba"/>
-                            </Style>
-                        </Button.Styles>
-                    </Button>
+                        <!-- Excel Processor -->
+                        <Button Command="{Binding NavigateToExcelProcessorCommand}"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Left"
+                                Padding="12,10"
+                                Margin="0,0,0,6"
+                                Background="Transparent"
+                                Foreground="White"
+                                BorderThickness="0"
+                                CornerRadius="10"
+                                Height="48"
+                                Cursor="Hand">
+                            <Grid ColumnDefinitions="Auto,*,Auto">
+                                <Border Grid.Column="0"
+                                        Background="#0d9fb8"
+                                        CornerRadius="8"
+                                        Width="32"
+                                        Height="32"
+                                        VerticalAlignment="Center"
+                                        Margin="0,0,12,0">
+                                    <TextBlock Text="📄" 
+                                               FontSize="16" 
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                                </Border>
+                                <TextBlock Grid.Column="1" 
+                                           Text="Excel Processor" 
+                                           FontSize="13.5"
+                                           FontWeight="Medium"
+                                           VerticalAlignment="Center"/>
+                                <Border Grid.Column="2"
+                                        Background="#78ffd6"
+                                        CornerRadius="4"
+                                        Width="4"
+                                        Height="24"
+                                        VerticalAlignment="Center"
+                                        Opacity="0"/>
+                            </Grid>
+                            <Button.Styles>
+                                <Style Selector="Button:pointerover">
+                                    <Setter Property="Background" Value="#0a8ca3"/>
+                                </Style>
+                                <Style Selector="Button:pressed">
+                                    <Setter Property="Background" Value="#0d9fb8"/>
+                                </Style>
+                            </Button.Styles>
+                        </Button>
 
-                    <Button Command="{Binding NavigateToCsvToDatabaseCommand}"
-                            HorizontalAlignment="Stretch"
-                            HorizontalContentAlignment="Left"
-                            Padding="0"
-                            Margin="0,2"
-                            Background="Transparent"
-                            Foreground="White"
-                            BorderThickness="0"
-                            CornerRadius="6"
-                            Height="38"
-                            Cursor="Hand">
-                        <Grid ColumnDefinitions="Auto,*" Margin="12,0">
-                            <TextBlock Grid.Column="0" 
-                                       Text="📁" 
-                                       FontSize="16" 
-                                       VerticalAlignment="Center"
-                                       Margin="0,0,10,0"/>
-                            <TextBlock Grid.Column="1" 
-                                       Text="CSV to Database" 
-                                       FontSize="13"
-                                       FontWeight="Medium"
-                                       VerticalAlignment="Center"/>
-                        </Grid>
-                        <Button.Styles>
-                            <Style Selector="Button:pointerover">
-                                <Setter Property="Background" Value="#78ffd6"/>
-                            </Style>
-                            <Style Selector="Button:pressed">
-                                <Setter Property="Background" Value="#4dd0ba"/>
-                            </Style>
-                        </Button.Styles>
-                    </Button>
+                        <!-- Database Loader -->
+                        <Button Command="{Binding NavigateToDatabaseLoaderCommand}"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Left"
+                                Padding="12,10"
+                                Margin="0,0,0,6"
+                                Background="Transparent"
+                                Foreground="White"
+                                BorderThickness="0"
+                                CornerRadius="10"
+                                Height="48"
+                                Cursor="Hand">
+                            <Grid ColumnDefinitions="Auto,*,Auto">
+                                <Border Grid.Column="0"
+                                        Background="#0d9fb8"
+                                        CornerRadius="8"
+                                        Width="32"
+                                        Height="32"
+                                        VerticalAlignment="Center"
+                                        Margin="0,0,12,0">
+                                    <TextBlock Text="🗄️" 
+                                               FontSize="16" 
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                                </Border>
+                                <TextBlock Grid.Column="1" 
+                                           Text="Database Loader" 
+                                           FontSize="13.5"
+                                           FontWeight="Medium"
+                                           VerticalAlignment="Center"/>
+                                <Border Grid.Column="2"
+                                        Background="#78ffd6"
+                                        CornerRadius="4"
+                                        Width="4"
+                                        Height="24"
+                                        VerticalAlignment="Center"
+                                        Opacity="0"/>
+                            </Grid>
+                            <Button.Styles>
+                                <Style Selector="Button:pointerover">
+                                    <Setter Property="Background" Value="#0a8ca3"/>
+                                </Style>
+                                <Style Selector="Button:pressed">
+                                    <Setter Property="Background" Value="#0d9fb8"/>
+                                </Style>
+                            </Button.Styles>
+                        </Button>
+
+                        <!-- CSV to Database -->
+                        <Button Command="{Binding NavigateToCsvToDatabaseCommand}"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Left"
+                                Padding="12,10"
+                                Margin="0,0,0,6"
+                                Background="Transparent"
+                                Foreground="White"
+                                BorderThickness="0"
+                                CornerRadius="10"
+                                Height="48"
+                                Cursor="Hand">
+                            <Grid ColumnDefinitions="Auto,*,Auto">
+                                <Border Grid.Column="0"
+                                        Background="#0d9fb8"
+                                        CornerRadius="8"
+                                        Width="32"
+                                        Height="32"
+                                        VerticalAlignment="Center"
+                                        Margin="0,0,12,0">
+                                    <TextBlock Text="📁" 
+                                               FontSize="16" 
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                                </Border>
+                                <TextBlock Grid.Column="1" 
+                                           Text="CSV to Database" 
+                                           FontSize="13.5"
+                                           FontWeight="Medium"
+                                           VerticalAlignment="Center"/>
+                                <Border Grid.Column="2"
+                                        Background="#78ffd6"
+                                        CornerRadius="4"
+                                        Width="4"
+                                        Height="24"
+                                        VerticalAlignment="Center"
+                                        Opacity="0"/>
+                            </Grid>
+                            <Button.Styles>
+                                <Style Selector="Button:pointerover">
+                                    <Setter Property="Background" Value="#0a8ca3"/>
+                                </Style>
+                                <Style Selector="Button:pressed">
+                                    <Setter Property="Background" Value="#0d9fb8"/>
+                                </Style>
+                            </Button.Styles>
+                        </Button>
+                    </StackPanel>
+
+                    <!-- Divider -->
+                    <Border Margin="20,18,20,18" 
+                            Background="#0a8ca3" 
+                            Height="1"
+                            CornerRadius="2"/>
+
+                    <!-- System Section -->
+                    <TextBlock Text="SYSTEM" 
+                               FontSize="11" 
+                               FontWeight="Bold"
+                               Foreground="#a8e6f0"
+                               Margin="20,0,0,12"
+                               LetterSpacing="1.2"/>
+
+                    <StackPanel Margin="10,0">
+                        <!-- Settings -->
+                        <Button Command="{Binding NavigateToSettingsCommand}"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Left"
+                                Padding="12,10"
+                                Margin="0,0,0,6"
+                                Background="Transparent"
+                                Foreground="White"
+                                BorderThickness="0"
+                                CornerRadius="10"
+                                Height="48"
+                                Cursor="Hand">
+                            <Grid ColumnDefinitions="Auto,*,Auto">
+                                <Border Grid.Column="0"
+                                        Background="#0d9fb8"
+                                        CornerRadius="8"
+                                        Width="32"
+                                        Height="32"
+                                        VerticalAlignment="Center"
+                                        Margin="0,0,12,0">
+                                    <TextBlock Text="⚙️" 
+                                               FontSize="16" 
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                                </Border>
+                                <TextBlock Grid.Column="1" 
+                                           Text="Settings" 
+                                           FontSize="13.5"
+                                           FontWeight="Medium"
+                                           VerticalAlignment="Center"/>
+                                <Border Grid.Column="2"
+                                        Background="#78ffd6"
+                                        CornerRadius="4"
+                                        Width="4"
+                                        Height="24"
+                                        VerticalAlignment="Center"
+                                        Opacity="0"/>
+                            </Grid>
+                            <Button.Styles>
+                                <Style Selector="Button:pointerover">
+                                    <Setter Property="Background" Value="#0a8ca3"/>
+                                </Style>
+                                <Style Selector="Button:pressed">
+                                    <Setter Property="Background" Value="#0d9fb8"/>
+                                </Style>
+                            </Button.Styles>
+                        </Button>
+
+                        <!-- About -->
+                        <Button Command="{Binding ShowAboutCommand}"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Left"
+                                Padding="12,10"
+                                Margin="0,0,0,6"
+                                Background="Transparent"
+                                Foreground="White"
+                                BorderThickness="0"
+                                CornerRadius="10"
+                                Height="48"
+                                Cursor="Hand">
+                            <Grid ColumnDefinitions="Auto,*,Auto">
+                                <Border Grid.Column="0"
+                                        Background="#0d9fb8"
+                                        CornerRadius="8"
+                                        Width="32"
+                                        Height="32"
+                                        VerticalAlignment="Center"
+                                        Margin="0,0,12,0">
+                                    <TextBlock Text="ℹ️" 
+                                               FontSize="16" 
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                                </Border>
+                                <TextBlock Grid.Column="1" 
+                                           Text="About" 
+                                           FontSize="13.5"
+                                           FontWeight="Medium"
+                                           VerticalAlignment="Center"/>
+                                <Border Grid.Column="2"
+                                        Background="#78ffd6"
+                                        CornerRadius="4"
+                                        Width="4"
+                                        Height="24"
+                                        VerticalAlignment="Center"
+                                        Opacity="0"/>
+                            </Grid>
+                            <Button.Styles>
+                                <Style Selector="Button:pointerover">
+                                    <Setter Property="Background" Value="#0a8ca3"/>
+                                </Style>
+                                <Style Selector="Button:pressed">
+                                    <Setter Property="Background" Value="#0d9fb8"/>
+                                </Style>
+                            </Button.Styles>
+                        </Button>
+                    </StackPanel>
                 </StackPanel>
-
-                <Separator Margin="12,16" Background="#006577" Height="1"/>
-
-                <StackPanel Margin="12,0">
-                    <Button Command="{Binding NavigateToSettingsCommand}"
-                            HorizontalAlignment="Stretch"
-                            HorizontalContentAlignment="Left"
-                            Padding="0"
-                            Margin="0,2"
-                            Background="Transparent"
-                            Foreground="White"
-                            BorderThickness="0"
-                            CornerRadius="6"
-                            Height="38"
-                            Cursor="Hand">
-                        <Grid ColumnDefinitions="Auto,*" Margin="12,0">
-                            <TextBlock Grid.Column="0" 
-                                       Text="⚙️" 
-                                       FontSize="16" 
-                                       VerticalAlignment="Center"
-                                       Margin="0,0,10,0"/>
-                            <TextBlock Grid.Column="1" 
-                                       Text="Settings" 
-                                       FontSize="13"
-                                       FontWeight="Medium"
-                                       VerticalAlignment="Center"/>
-                        </Grid>
-                        <Button.Styles>
-                            <Style Selector="Button:pointerover">
-                                <Setter Property="Background" Value="#78ffd6"/>
-                            </Style>
-                            <Style Selector="Button:pressed">
-                                <Setter Property="Background" Value="#4dd0ba"/>
-                            </Style>
-                        </Button.Styles>
-                    </Button>
-
-                    <Button Command="{Binding ShowAboutCommand}"
-                            HorizontalAlignment="Stretch"
-                            HorizontalContentAlignment="Left"
-                            Padding="0"
-                            Margin="0,2"
-                            Background="Transparent"
-                            Foreground="White"
-                            BorderThickness="0"
-                            CornerRadius="6"
-                            Height="38"
-                            Cursor="Hand">
-                        <Grid ColumnDefinitions="Auto,*" Margin="12,0">
-                            <TextBlock Grid.Column="0" 
-                                       Text="ℹ️" 
-                                       FontSize="16" 
-                                       VerticalAlignment="Center"
-                                       Margin="0,0,10,0"/>
-                            <TextBlock Grid.Column="1" 
-                                       Text="About" 
-                                       FontSize="13"
-                                       FontWeight="Medium"
-                                       VerticalAlignment="Center"/>
-                        </Grid>
-                        <Button.Styles>
-                            <Style Selector="Button:pointerover">
-                                <Setter Property="Background" Value="#78ffd6"/>
-                            </Style>
-                            <Style Selector="Button:pressed">
-                                <Setter Property="Background" Value="#4dd0ba"/>
-                            </Style>
-                        </Button.Styles>
-                    </Button>
-                </StackPanel>
-
-            </StackPanel>
+            </ScrollViewer>
         </Border>
 
         <!-- Content Area -->
@@ -602,7 +732,7 @@
                 </Border>
 
                 <!-- Footer Right (Main content area) -->
-                <Grid Grid.Column="1" Margin="28,0">
+                <Grid Grid.Column="1" Margin="32,0,28,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
@@ -611,27 +741,30 @@
                     <!-- Status Information -->
                     <StackPanel Grid.Column="0" 
                                Orientation="Horizontal" 
-                               Spacing="16"
+                               Spacing="18"
                                VerticalAlignment="Center">
                         <!-- Copyright -->
                         <TextBlock Text="© 2025 Universal Excel Tool. All rights reserved." 
-                                   FontSize="10" 
+                                   FontSize="11" 
+                                   FontWeight="Medium"
                                    Foreground="#6B7280"
+                                   LetterSpacing="0.2"
                                    VerticalAlignment="Center"/>
                         <TextBlock Text="|" 
-                                   FontSize="10" 
+                                   FontSize="11" 
                                    Foreground="#D1D5DB"
                                    VerticalAlignment="Center"/>
                         <!-- Status Badge -->
-                        <StackPanel Orientation="Horizontal" Spacing="6">
-                            <Ellipse Width="8" 
-                                    Height="8" 
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <Ellipse Width="9" 
+                                    Height="9" 
                                     Fill="#10B981"
                                     VerticalAlignment="Center"/>
                             <TextBlock Text="System Ready" 
-                                       FontSize="10" 
+                                       FontSize="11" 
                                        Foreground="#10B981"
-                                       FontWeight="Medium"
+                                       FontWeight="SemiBold"
+                                       LetterSpacing="0.3"
                                        VerticalAlignment="Center"/>
                         </StackPanel>
                     </StackPanel>
@@ -639,12 +772,14 @@
                     <!-- System Info -->
                     <StackPanel Grid.Column="1" 
                                Orientation="Horizontal" 
-                               Spacing="12"
+                               Spacing="14"
                                VerticalAlignment="Center">
                         <TextBlock Text="{Binding CurrentPageDescription}" 
-                                   FontSize="10" 
+                                   FontSize="11" 
+                                   FontWeight="Medium"
                                    Foreground="#9CA3AF"
                                    FontStyle="Italic"
+                                   LetterSpacing="0.2"
                                    VerticalAlignment="Center"/>
                     </StackPanel>
                 </Grid>
