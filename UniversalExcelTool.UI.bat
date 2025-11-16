@@ -16,8 +16,19 @@ if errorlevel 1 (
     exit /b 1
 )
 
-REM Check if Release build exists
-if not exist "UniversalExcelTool.UI\bin\Release\net8.0\UniversalExcelTool.UI.exe" (
+REM Check if Release build exists and clean/rebuild
+if exist "UniversalExcelTool.UI\bin\Release\net8.0\UniversalExcelTool.UI.exe" (
+    echo Release build found. Cleaning and rebuilding UI...
+    dotnet clean "UniversalExcelTool.UI\UniversalExcelTool.UI.csproj" -c Release
+    dotnet build "UniversalExcelTool.UI\UniversalExcelTool.UI.csproj" -c Release
+    if errorlevel 1 (
+        echo Build failed!
+        pause
+        exit /b 1
+    )
+    echo Build completed successfully.
+    echo.
+) else (
     echo Release build not found. Building UI...
     dotnet build "UniversalExcelTool.UI\UniversalExcelTool.UI.csproj" -c Release
     if errorlevel 1 (
