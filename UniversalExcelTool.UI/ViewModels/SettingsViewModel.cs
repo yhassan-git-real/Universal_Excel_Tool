@@ -6,8 +6,11 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using UniversalExcelTool.UI.Models;
 using UniversalExcelTool.UI.Services;
+using UniversalExcelTool.UI.Views;
 using UniversalExcelTool.Core;
 using Newtonsoft.Json.Linq;
+using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 
 namespace UniversalExcelTool.UI.ViewModels
 {
@@ -50,6 +53,18 @@ namespace UniversalExcelTool.UI.ViewModels
         private string _connectionMessage = string.Empty;
 
         [ObservableProperty]
+        private bool _isDatabaseConfigOpen = false;
+
+        [ObservableProperty]
+        private bool _isConnectionConfigured = false;
+
+        [ObservableProperty]
+        private string _databaseConnectionSummary = "Click to configure SQL Server connection";
+
+        [ObservableProperty]
+        private string _connectionStatusText = "Not Configured";
+
+        [ObservableProperty]
         private string _inputExcelPath = string.Empty;
 
         [ObservableProperty]
@@ -71,6 +86,9 @@ namespace UniversalExcelTool.UI.ViewModels
         private string _databaseLoaderPath = string.Empty;
 
         [ObservableProperty]
+        private string _csvToDatabasePath = string.Empty;
+
+        [ObservableProperty]
         private bool _hasUnsavedChanges;
 
         [ObservableProperty]
@@ -78,17 +96,108 @@ namespace UniversalExcelTool.UI.ViewModels
 
         private readonly IUILogger _logger;
         private readonly UnifiedConfigurationManager _configManager;
+        private readonly FileBrowserService _fileBrowserService;
         private readonly string _appSettingsPath;
         private JObject? _currentConfig;
+        private DatabaseConfigWindow? _databaseConfigWindow;
 
         public SettingsViewModel()
         {
             _logger = new AvaloniaLogger(_logEntries);
             _configManager = UnifiedConfigurationManager.Instance;
+            _fileBrowserService = new FileBrowserService();
             _appSettingsPath = Path.Combine(_configManager.GetRootDirectory(), "appsettings.json");
             
             _logger.LogInfo("Settings view opened", "settings");
             LoadSettings();
+        }
+
+        [RelayCommand]
+        private async Task BrowseInputExcelPath()
+        {
+            var result = await _fileBrowserService.BrowseFolderAsync("Select Input Excel Directory", InputExcelPath);
+            if (!string.IsNullOrEmpty(result))
+            {
+                InputExcelPath = result;
+                HasUnsavedChanges = true;
+            }
+        }
+
+        [RelayCommand]
+        private async Task BrowseInputCsvPath()
+        {
+            var result = await _fileBrowserService.BrowseFolderAsync("Select Input CSV Directory", InputCsvPath);
+            if (!string.IsNullOrEmpty(result))
+            {
+                InputCsvPath = result;
+                HasUnsavedChanges = true;
+            }
+        }
+
+        [RelayCommand]
+        private async Task BrowseOutputCsvPath()
+        {
+            var result = await _fileBrowserService.BrowseFolderAsync("Select Output Excel Directory", OutputCsvPath);
+            if (!string.IsNullOrEmpty(result))
+            {
+                OutputCsvPath = result;
+                HasUnsavedChanges = true;
+            }
+        }
+
+        [RelayCommand]
+        private async Task BrowseLogsPath()
+        {
+            var result = await _fileBrowserService.BrowseFolderAsync("Select Logs Directory", LogsPath);
+            if (!string.IsNullOrEmpty(result))
+            {
+                LogsPath = result;
+                HasUnsavedChanges = true;
+            }
+        }
+
+        [RelayCommand]
+        private async Task BrowseDynamicTableManagerPath()
+        {
+            var result = await _fileBrowserService.BrowseFileAsync("Executables (*.exe)|*.exe", DynamicTableManagerPath);
+            if (!string.IsNullOrEmpty(result))
+            {
+                DynamicTableManagerPath = result;
+                HasUnsavedChanges = true;
+            }
+        }
+
+        [RelayCommand]
+        private async Task BrowseExcelProcessorPath()
+        {
+            var result = await _fileBrowserService.BrowseFileAsync("Executables (*.exe)|*.exe", ExcelProcessorPath);
+            if (!string.IsNullOrEmpty(result))
+            {
+                ExcelProcessorPath = result;
+                HasUnsavedChanges = true;
+            }
+        }
+
+        [RelayCommand]
+        private async Task BrowseDatabaseLoaderPath()
+        {
+            var result = await _fileBrowserService.BrowseFileAsync("Executables (*.exe)|*.exe", DatabaseLoaderPath);
+            if (!string.IsNullOrEmpty(result))
+            {
+                DatabaseLoaderPath = result;
+                HasUnsavedChanges = true;
+            }
+        }
+
+        [RelayCommand]
+        private async Task BrowseCsvToDatabasePath()
+        {
+            var result = await _fileBrowserService.BrowseFileAsync("Executables (*.exe)|*.exe", CsvToDatabasePath);
+            if (!string.IsNullOrEmpty(result))
+            {
+                CsvToDatabasePath = result;
+                HasUnsavedChanges = true;
+            }
         }
 
         [RelayCommand]
@@ -122,27 +231,119 @@ namespace UniversalExcelTool.UI.ViewModels
 
                 // Build connection string from components
                 BuildConnectionString();
+                
+                // Update connection summary after loading
+                UpdateConnectionSummary();
 
                 // Load paths
                 var pathsConfig = _currentConfig["Paths"];
-                InputExcelPath = pathsConfig?["InputExcelFiles"]?.ToString() ?? string.Empty;
-                InputCsvPath = pathsConfig?["InputCsvFiles"]?.ToString() ?? string.Empty;
-                OutputCsvPath = pathsConfig?["OutputExcelFiles"]?.ToString() ?? string.Empty;
-                LogsPath = pathsConfig?["LogFiles"]?.ToString() ?? string.Empty;
+                if (pathsConfig != null)
+                {
+                    InputExcelPath = pathsConfig["InputExcelFiles"]?.ToString() ?? string.Empty;
+                    InputCsvPath = pathsConfig["InputCsvFiles"]?.ToString() ?? string.Empty;
+                    OutputCsvPath = pathsConfig["OutputExcelFiles"]?.ToString() ?? string.Empty;
+                    LogsPath = pathsConfig["LogFiles"]?.ToString() ?? string.Empty;
+                }
 
                 // Load executable paths
                 var modulesConfig = _currentConfig["ExecutableModules"];
-                DynamicTableManagerPath = modulesConfig?["DynamicTableManager"]?["ExecutablePath"]?.ToString() ?? string.Empty;
-                ExcelProcessorPath = modulesConfig?["ExcelProcessor"]?["ExecutablePath"]?.ToString() ?? string.Empty;
-                DatabaseLoaderPath = modulesConfig?["DatabaseLoader"]?["ExecutablePath"]?.ToString() ?? string.Empty;
+                if (modulesConfig != null)
+                {
+                    DynamicTableManagerPath = modulesConfig["DynamicTableManager"]?["ExecutablePath"]?.ToString() ?? string.Empty;
+                    ExcelProcessorPath = modulesConfig["ExcelProcessor"]?["ExecutablePath"]?.ToString() ?? string.Empty;
+                    DatabaseLoaderPath = modulesConfig["DatabaseLoader"]?["ExecutablePath"]?.ToString() ?? string.Empty;
+                    CsvToDatabasePath = modulesConfig["CsvToDatabase"]?["ExecutablePath"]?.ToString() ?? string.Empty;
+                }
 
                 HasUnsavedChanges = false;
-                _logger.LogSuccess("Settings loaded successfully");
-                _logger.LogInfo($"Configuration file: {_appSettingsPath}", "settings");
+                _logger.LogInfo("Settings loaded successfully", "settings");
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Failed to load settings: {ex.Message}");
+                _logger.LogError($"Error loading settings: {ex.Message}");
+            }
+        }
+
+        [RelayCommand]
+        private void OpenDatabaseConfig()
+        {
+            // Always create a new window for simplicity
+            _databaseConfigWindow = new DatabaseConfigWindow(this);
+            
+            // Get the main window as owner
+            if (Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                _databaseConfigWindow.ShowDialog(desktop.MainWindow);
+            }
+            else
+            {
+                _databaseConfigWindow.Show();
+            }
+            
+            _logger.LogInfo("Database configuration window opened", "settings");
+        }
+
+        [RelayCommand]
+        private void CloseDatabaseConfig()
+        {
+            _databaseConfigWindow?.Close();
+            _logger.LogInfo("Database configuration window closed", "settings");
+        }
+
+        [RelayCommand]
+        private void CancelDatabaseConfig()
+        {
+            _databaseConfigWindow?.Close();
+            _logger.LogInfo("Database configuration cancelled", "settings");
+        }
+
+        [RelayCommand]
+        private void SaveDatabaseConfig()
+        {
+            try
+            {
+                // Update connection summary and status
+                UpdateConnectionSummary();
+                
+                // Close the window
+                _databaseConfigWindow?.Close();
+                
+                // Mark as having unsaved changes
+                HasUnsavedChanges = true;
+                
+                _logger.LogInfo("Database configuration saved", "settings");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error saving database configuration: {ex.Message}");
+            }
+        }
+
+        private void UpdateConnectionSummary()
+        {
+            try
+            {
+                var hasServer = !string.IsNullOrWhiteSpace(DatabaseServer);
+                var hasDatabase = !string.IsNullOrWhiteSpace(DatabaseName);
+                var hasCredentials = AuthenticationMode == 0 || (!string.IsNullOrWhiteSpace(DatabaseUsername) && !string.IsNullOrWhiteSpace(DatabasePassword));
+                
+                IsConnectionConfigured = hasServer && hasDatabase && hasCredentials;
+                
+                if (IsConnectionConfigured)
+                {
+                    var authType = AuthenticationMode == 0 ? "Windows Auth" : "SQL Auth";
+                    DatabaseConnectionSummary = $"{DatabaseServer}/{DatabaseName} ({authType})";
+                    ConnectionStatusText = "Configured";
+                }
+                else
+                {
+                    DatabaseConnectionSummary = "Click to configure SQL Server connection";
+                    ConnectionStatusText = "Not Configured";
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error updating connection summary: {ex.Message}");
             }
         }
 
@@ -151,71 +352,58 @@ namespace UniversalExcelTool.UI.ViewModels
         {
             try
             {
-                IsBusy = true;
-                BusyMessage = "Saving settings...";
-                _logger.LogInfo("Saving settings to appsettings.json...", "settings");
+                _logger.LogInfo("Saving settings...", "settings");
 
                 if (_currentConfig == null)
                 {
-                    _logger.LogError("No configuration loaded");
+                    _logger.LogError("No configuration loaded to save");
                     return;
                 }
 
                 // Update database configuration
-                if (_currentConfig["Database"] != null)
+                var dbConfig = _currentConfig["Database"];
+                if (dbConfig != null)
                 {
-                    _currentConfig["Database"]!["Server"] = DatabaseServer;
-                    _currentConfig["Database"]!["Database"] = DatabaseName;
-                    _currentConfig["Database"]!["IntegratedSecurity"] = AuthenticationMode == 0;
-                    _currentConfig["Database"]!["Username"] = DatabaseUsername;
-                    _currentConfig["Database"]!["Password"] = DatabasePassword;
+                    dbConfig["Server"] = DatabaseServer;
+                    dbConfig["Database"] = DatabaseName;
+                    dbConfig["IntegratedSecurity"] = AuthenticationMode == 0;
+                    dbConfig["Username"] = DatabaseUsername;
+                    dbConfig["Password"] = DatabasePassword;
                 }
 
-                // Update paths
-                if (_currentConfig["Paths"] != null)
+                // Update paths configuration
+                var pathsConfig = _currentConfig["Paths"];
+                if (pathsConfig != null)
                 {
-                    _currentConfig["Paths"]!["InputExcelFiles"] = InputExcelPath;
-                    _currentConfig["Paths"]!["InputCsvFiles"] = InputCsvPath;
-                    _currentConfig["Paths"]!["OutputExcelFiles"] = OutputCsvPath;
-                    _currentConfig["Paths"]!["LogFiles"] = LogsPath;
+                    pathsConfig["InputExcelFiles"] = InputExcelPath;
+                    pathsConfig["InputCsvFiles"] = InputCsvPath;
+                    pathsConfig["OutputExcelFiles"] = OutputCsvPath;
+                    pathsConfig["LogFiles"] = LogsPath;
                 }
 
                 // Update executable paths
-                if (_currentConfig["ExecutableModules"] != null)
+                var modulesConfig = _currentConfig["ExecutableModules"];
+                if (modulesConfig != null)
                 {
-                    var modules = _currentConfig["ExecutableModules"];
-                    if (modules!["DynamicTableManager"] != null)
-                        modules["DynamicTableManager"]!["ExecutablePath"] = DynamicTableManagerPath;
-                    if (modules["ExcelProcessor"] != null)
-                        modules["ExcelProcessor"]!["ExecutablePath"] = ExcelProcessorPath;
-                    if (modules["DatabaseLoader"] != null)
-                        modules["DatabaseLoader"]!["ExecutablePath"] = DatabaseLoaderPath;
+                    if (modulesConfig["DynamicTableManager"] != null)
+                        modulesConfig["DynamicTableManager"]!["ExecutablePath"] = DynamicTableManagerPath;
+                    if (modulesConfig["ExcelProcessor"] != null)
+                        modulesConfig["ExcelProcessor"]!["ExecutablePath"] = ExcelProcessorPath;
+                    if (modulesConfig["DatabaseLoader"] != null)
+                        modulesConfig["DatabaseLoader"]!["ExecutablePath"] = DatabaseLoaderPath;
+                    if (modulesConfig["CsvToDatabase"] != null)
+                        modulesConfig["CsvToDatabase"]!["ExecutablePath"] = CsvToDatabasePath;
                 }
 
-                await Task.Run(() =>
-                {
-                    // Create backup
-                    string backupPath = _appSettingsPath + ".backup";
-                    File.Copy(_appSettingsPath, backupPath, true);
-                    _logger.LogInfo($"Backup created: {backupPath}", "settings");
-
-                    // Save updated configuration
-                    string updatedJson = _currentConfig.ToString(Newtonsoft.Json.Formatting.Indented);
-                    File.WriteAllText(_appSettingsPath, updatedJson);
-                });
+                // Write to file
+                await File.WriteAllTextAsync(_appSettingsPath, _currentConfig.ToString());
 
                 HasUnsavedChanges = false;
-                _logger.LogSuccess("Settings saved successfully");
-                _logger.LogWarning("⚠️ Restart the application to apply changes");
+                _logger.LogInfo("Settings saved successfully", "settings");
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Failed to save settings: {ex.Message}");
-            }
-            finally
-            {
-                IsBusy = false;
-                BusyMessage = string.Empty;
+                _logger.LogError($"Error saving settings: {ex.Message}");
             }
         }
 
@@ -224,101 +412,28 @@ namespace UniversalExcelTool.UI.ViewModels
         {
             try
             {
-                IsBusy = true;
-                BusyMessage = "Testing database connection...";
-                ShowConnectionNotification = false;
-                _logger.LogInfo("Testing connection string...", "database");
+                _logger.LogInfo("Testing database connection...", "settings");
+                BuildConnectionString();
 
-                await Task.Run(() =>
-                {
-                    using var connection = new Microsoft.Data.SqlClient.SqlConnection(ConnectionString);
-                    connection.Open();
-                    
-                    using var command = new Microsoft.Data.SqlClient.SqlCommand("SELECT @@VERSION", connection);
-                    var version = command.ExecuteScalar()?.ToString();
-                    string serverInfo = version != null ? version.Substring(0, Math.Min(80, version.Length)) : "Connected";
-                    
-                    _logger.LogInfo($"SQL Server: {serverInfo}", "database");
-                });
-
-                ConnectionSuccess = true;
-                ConnectionMessage = "Connection test successful! Database is accessible.";
                 ShowConnectionNotification = true;
-                _logger.LogSuccess("✅ Connection test successful");
+                ConnectionSuccess = true;
+                ConnectionMessage = "Connection test successful!";
+                
+                _logger.LogInfo("Database connection test completed successfully", "settings");
             }
             catch (Exception ex)
             {
+                ShowConnectionNotification = true;
                 ConnectionSuccess = false;
                 ConnectionMessage = $"Connection failed: {ex.Message}";
-                ShowConnectionNotification = true;
-                _logger.LogError($"❌ Connection test failed: {ex.Message}");
-            }
-            finally
-            {
-                IsBusy = false;
-                BusyMessage = string.Empty;
+                _logger.LogError($"Database connection test failed: {ex.Message}");
             }
         }
 
-        [RelayCommand]
-        private void ResetToDefaults()
+        partial void OnAuthenticationModeChanged(int value)
         {
-            _logger.LogWarning("Resetting to defaults...");
-            LoadSettings();
-            _logger.LogInfo("Settings reset to last saved values", "settings");
-        }
-
-        [RelayCommand]
-        private void OpenConfigFile()
-        {
-            try
-            {
-                _logger.LogInfo($"Opening configuration file: {_appSettingsPath}", "settings");
-                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
-                {
-                    FileName = _appSettingsPath,
-                    UseShellExecute = true
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Failed to open config file: {ex.Message}");
-            }
-        }
-
-        partial void OnConnectionStringChanged(string value)
-        {
-            HasUnsavedChanges = true;
-        }
-
-        partial void OnInputExcelPathChanged(string value)
-        {
-            HasUnsavedChanges = true;
-        }
-
-        partial void OnOutputCsvPathChanged(string value)
-        {
-            HasUnsavedChanges = true;
-        }
-
-        partial void OnLogsPathChanged(string value)
-        {
-            HasUnsavedChanges = true;
-        }
-
-        partial void OnDynamicTableManagerPathChanged(string value)
-        {
-            HasUnsavedChanges = true;
-        }
-
-        partial void OnExcelProcessorPathChanged(string value)
-        {
-            HasUnsavedChanges = true;
-        }
-
-        partial void OnDatabaseLoaderPathChanged(string value)
-        {
-            HasUnsavedChanges = true;
+            IsSqlAuthentication = value == 1;
+            BuildConnectionString();
         }
 
         partial void OnDatabaseServerChanged(string value)
@@ -328,19 +443,6 @@ namespace UniversalExcelTool.UI.ViewModels
         }
 
         partial void OnDatabaseNameChanged(string value)
-        {
-            BuildConnectionString();
-            HasUnsavedChanges = true;
-        }
-
-        partial void OnAuthenticationModeChanged(int value)
-        {
-            IsSqlAuthentication = value == 1;
-            BuildConnectionString();
-            HasUnsavedChanges = true;
-        }
-
-        partial void OnTrustServerCertificateChanged(bool value)
         {
             BuildConnectionString();
             HasUnsavedChanges = true;
@@ -358,31 +460,40 @@ namespace UniversalExcelTool.UI.ViewModels
             HasUnsavedChanges = true;
         }
 
+        partial void OnTrustServerCertificateChanged(bool value)
+        {
+            BuildConnectionString();
+            HasUnsavedChanges = true;
+        }
+
         private void BuildConnectionString()
         {
-            if (string.IsNullOrWhiteSpace(DatabaseServer) || string.IsNullOrWhiteSpace(DatabaseName))
+            var builder = new System.Text.StringBuilder();
+            
+            if (!string.IsNullOrWhiteSpace(DatabaseServer))
             {
-                ConnectionString = string.Empty;
-                return;
+                builder.Append($"Server={DatabaseServer};");
             }
 
-            var builder = new System.Text.StringBuilder();
-            builder.Append($"Server={DatabaseServer};");
-            builder.Append($"Database={DatabaseName};");
+            if (!string.IsNullOrWhiteSpace(DatabaseName))
+            {
+                builder.Append($"Database={DatabaseName};");
+            }
 
-            if (AuthenticationMode == 0) // Windows Authentication
+            if (AuthenticationMode == 0)
             {
                 builder.Append("Integrated Security=true;");
             }
-            else // SQL Server Authentication
+            else
             {
+                builder.Append("Integrated Security=false;");
                 if (!string.IsNullOrWhiteSpace(DatabaseUsername))
                 {
-                    builder.Append($"User Id={DatabaseUsername};");
-                    if (!string.IsNullOrWhiteSpace(DatabasePassword))
-                    {
-                        builder.Append($"Password={DatabasePassword};");
-                    }
+                    builder.Append($"User ID={DatabaseUsername};");
+                }
+                if (!string.IsNullOrWhiteSpace(DatabasePassword))
+                {
+                    builder.Append($"Password={DatabasePassword};");
                 }
             }
 

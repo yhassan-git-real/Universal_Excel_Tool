@@ -90,4 +90,70 @@ namespace UniversalExcelTool.UI.Converters
             throw new NotImplementedException();
         }
     }
+
+    /// <summary>
+    /// Converts boolean to status background color (configured = green, not configured = yellow)
+    /// </summary>
+    public class BoolToStatusColorConverter : IValueConverter
+    {
+        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        {
+            if (value is bool isConfigured)
+            {
+                return isConfigured 
+                    ? new SolidColorBrush(Color.Parse("#DCFCE7")) // Light green
+                    : new SolidColorBrush(Color.Parse("#FEF3C7")); // Light yellow
+            }
+            return new SolidColorBrush(Color.Parse("#FEF3C7"));
+        }
+
+        public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    /// <summary>
+    /// Converts boolean to status border color (configured = green, not configured = yellow)
+    /// </summary>
+    public class BoolToStatusBorderConverter : IValueConverter
+    {
+        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        {
+            if (value is bool isConfigured)
+            {
+                return isConfigured 
+                    ? new SolidColorBrush(Color.Parse("#10B981")) // Green
+                    : new SolidColorBrush(Color.Parse("#FCD34D")); // Yellow
+            }
+            return new SolidColorBrush(Color.Parse("#FCD34D"));
+        }
+
+        public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    /// <summary>
+    /// Converts boolean to status text color (configured = green, not configured = yellow)
+    /// </summary>
+    public class BoolToStatusTextConverter : IValueConverter
+    {
+        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        {
+            if (value is bool isConfigured)
+            {
+                return isConfigured 
+                    ? new SolidColorBrush(Color.Parse("#059669")) // Dark green
+                    : new SolidColorBrush(Color.Parse("#92400E")); // Dark yellow
+            }
+            return new SolidColorBrush(Color.Parse("#92400E"));
+        }
+
+        public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

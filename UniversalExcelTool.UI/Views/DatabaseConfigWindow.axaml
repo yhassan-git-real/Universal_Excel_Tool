@@ -1,0 +1,294 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:UniversalExcelTool.UI.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="450"
+        x:Class="UniversalExcelTool.UI.Views.DatabaseConfigWindow"
+        x:DataType="vm:SettingsViewModel"
+        Title="Database Connection Configuration"
+        Width="500" SizeToContent="Height"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        ShowInTaskbar="False">
+
+    <Design.DataContext>
+        <vm:SettingsViewModel/>
+    </Design.DataContext>
+
+    <Grid RowDefinitions="Auto,Auto,Auto">
+        <!-- Header -->
+        <Border Grid.Row="0" 
+                Background="#F8FAFC"
+                BorderBrush="#E5E7EB"
+                BorderThickness="0,0,0,1"
+                Padding="16,12">
+            <StackPanel Orientation="Horizontal" Spacing="12">
+                <Border Background="#EEF2FF"
+                        CornerRadius="6"
+                        Width="32"
+                        Height="32"
+                        VerticalAlignment="Center">
+                    <TextBlock Text="🗄️" 
+                               FontSize="16" 
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"/>
+                </Border>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="Database Connection" 
+                               FontSize="16" 
+                               FontWeight="SemiBold"
+                               Foreground="#1A1A1A"/>
+                    <TextBlock Text="Configure SQL Server connection settings"
+                               FontSize="12"
+                               Foreground="#6B7280"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+        
+        <!-- Content -->
+        <Border Grid.Row="1" Padding="16,12,16,24">
+            <StackPanel Spacing="8">
+                <!-- Connection Test Notification Bar -->
+                <Border Background="{Binding ConnectionSuccess, Converter={StaticResource BoolToNotificationColorConverter}}"
+                        BorderBrush="{Binding ConnectionSuccess, Converter={StaticResource BoolToNotificationBorderConverter}}"
+                        BorderThickness="1"
+                        CornerRadius="6"
+                        Padding="12,6"
+                        IsVisible="{Binding ShowConnectionNotification}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="{Binding ConnectionSuccess, Converter={StaticResource BoolToIconConverter}}" 
+                                   FontSize="14" 
+                                   VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding ConnectionMessage}"
+                                   FontSize="11"
+                                   Foreground="{Binding ConnectionSuccess, Converter={StaticResource BoolToNotificationTextConverter}}"
+                                   TextWrapping="Wrap"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Connection Fields -->
+                <StackPanel Spacing="8">
+                    <!-- Server and Database Row -->
+                    <Grid ColumnDefinitions="*,12,*">
+                        <!-- Server Name -->
+                        <StackPanel Grid.Column="0" Spacing="4">
+                            <TextBlock Text="Server Name" 
+                                       FontSize="11" 
+                                       FontWeight="Medium"
+                                       Foreground="#1A1A1A"/>
+                            <TextBox Text="{Binding DatabaseServer}"
+                                     Watermark="localhost or SERVER\INSTANCE"
+                                     Height="28"
+                                     FontSize="11"
+                                     Padding="8,0"
+                                     CornerRadius="4"
+                                     BorderThickness="1"
+                                     BorderBrush="#D1D5DB"
+                                     VerticalContentAlignment="Center"/>
+                        </StackPanel>
+
+                        <!-- Database Name -->
+                        <StackPanel Grid.Column="2" Spacing="4">
+                            <TextBlock Text="Database Name" 
+                                       FontSize="11" 
+                                       FontWeight="Medium"
+                                       Foreground="#1A1A1A"/>
+                            <TextBox Text="{Binding DatabaseName}"
+                                     Watermark="MyDatabase"
+                                     Height="28"
+                                     FontSize="11"
+                                     Padding="8,0"
+                                     CornerRadius="4"
+                                     BorderThickness="1"
+                                     BorderBrush="#D1D5DB"
+                                     VerticalContentAlignment="Center"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Authentication Mode -->
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="Authentication Mode" 
+                                   FontSize="11" 
+                                   FontWeight="Medium"
+                                   Foreground="#1A1A1A"/>
+                        <ComboBox SelectedIndex="{Binding AuthenticationMode}"
+                                  Height="28"
+                                  FontSize="11"
+                                  Padding="8,0"
+                                  CornerRadius="4"
+                                  BorderThickness="1"
+                                  BorderBrush="#D1D5DB"
+                                  HorizontalAlignment="Stretch">
+                            <ComboBoxItem Content="Windows Authentication"/>
+                            <ComboBoxItem Content="SQL Server Authentication"/>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <!-- SQL Authentication Fields -->
+                    <Grid ColumnDefinitions="*,12,*" IsVisible="{Binding IsSqlAuthentication}">
+                        <!-- Username -->
+                        <StackPanel Grid.Column="0" Spacing="4">
+                            <TextBlock Text="Username" 
+                                       FontSize="11" 
+                                       FontWeight="Medium"
+                                       Foreground="#1A1A1A"/>
+                            <TextBox Text="{Binding DatabaseUsername}"
+                                     Watermark="sa or username"
+                                     Height="28"
+                                     FontSize="11"
+                                     Padding="8,0"
+                                     CornerRadius="4"
+                                     BorderThickness="1"
+                                     BorderBrush="#D1D5DB"
+                                     VerticalContentAlignment="Center"/>
+                        </StackPanel>
+
+                        <!-- Password -->
+                        <StackPanel Grid.Column="2" Spacing="4">
+                            <TextBlock Text="Password" 
+                                       FontSize="11" 
+                                       FontWeight="Medium"
+                                       Foreground="#1A1A1A"/>
+                            <TextBox Text="{Binding DatabasePassword}"
+                                     Watermark="Enter password"
+                                     PasswordChar="•"
+                                     Height="28"
+                                     FontSize="11"
+                                     Padding="8,0"
+                                     CornerRadius="4"
+                                     BorderThickness="1"
+                                     BorderBrush="#D1D5DB"
+                                     VerticalContentAlignment="Center"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Security Options Expander -->
+                    <Expander Header="Security Options" 
+                              IsExpanded="False"
+                              HorizontalAlignment="Stretch"
+                              Padding="0"
+                              MinHeight="28">
+                        <Border BorderBrush="#D1D5DB"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Padding="12,8"
+                                Margin="0,4,0,0"
+                                Background="#FAFBFC">
+                            <CheckBox IsChecked="{Binding TrustServerCertificate}"
+                                      FontSize="11">
+                                <TextBlock Text="Trust Server Certificate" 
+                                           FontSize="11"/>
+                            </CheckBox>
+                        </Border>
+                    </Expander>
+
+                    <!-- Connection String Preview Expander -->
+                    <Expander Header="Connection String Preview" 
+                              IsExpanded="False"
+                              HorizontalAlignment="Stretch"
+                              Padding="0"
+                              MinHeight="28">
+                        <Border Background="#F9FAFB"
+                                BorderBrush="#E5E7EB"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Padding="12,8"
+                                Margin="0,4,0,0">
+                            <TextBlock Text="{Binding ConnectionString}"
+                                       FontSize="11"
+                                       FontFamily="Consolas"
+                                       Foreground="#374151"
+                                       TextWrapping="Wrap"/>
+                        </Border>
+                    </Expander>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+        
+        <!-- Footer -->
+        <Border Grid.Row="2" 
+                Background="#F8FAFC"
+                BorderBrush="#E5E7EB"
+                BorderThickness="0,1,0,0"
+                Padding="16,12">
+            <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+                <!-- Test Connection Button -->
+                <Button Grid.Column="1"
+                        Command="{Binding TestConnectionCommand}"
+                        IsEnabled="{Binding !IsBusy}"
+                        Height="28"
+                        Padding="16,0"
+                        Background="#007991"
+                        Foreground="White"
+                        BorderThickness="0"
+                        CornerRadius="6"
+                        FontSize="11"
+                        FontWeight="Medium"
+                        Margin="0,0,8,0">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Text="🔍" FontSize="11" VerticalAlignment="Center"/>
+                        <TextBlock Text="Test Connection" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover /template/ ContentPresenter">
+                            <Setter Property="Background" Value="#009bb8"/>
+                        </Style>
+                        <Style Selector="Button:pressed /template/ ContentPresenter">
+                            <Setter Property="Background" Value="#005f70"/>
+                        </Style>
+                    </Button.Styles>
+                </Button>
+                
+                <!-- Cancel Button -->
+                <Button Grid.Column="2"
+                        Command="{Binding CancelDatabaseConfigCommand}"
+                        Height="28"
+                        Padding="16,0"
+                        Background="#6B7280"
+                        Foreground="White"
+                        BorderThickness="0"
+                        CornerRadius="6"
+                        FontSize="11"
+                        FontWeight="Medium"
+                        Margin="0,0,8,0">
+                    <TextBlock Text="Cancel" VerticalAlignment="Center"/>
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover /template/ ContentPresenter">
+                            <Setter Property="Background" Value="#848b9a"/>
+                        </Style>
+                        <Style Selector="Button:pressed /template/ ContentPresenter">
+                            <Setter Property="Background" Value="#4b5563"/>
+                        </Style>
+                    </Button.Styles>
+                </Button>
+                
+                <!-- Save Button -->
+                <Button Grid.Column="3"
+                        Command="{Binding SaveDatabaseConfigCommand}"
+                        Height="28"
+                        Padding="20,0"
+                        Background="#10B981"
+                        Foreground="White"
+                        BorderThickness="0"
+                        CornerRadius="6"
+                        FontSize="11"
+                        FontWeight="Medium">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Text="💾" FontSize="11" VerticalAlignment="Center"/>
+                        <TextBlock Text="Save" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover /template/ ContentPresenter">
+                            <Setter Property="Background" Value="#34d399"/>
+                        </Style>
+                        <Style Selector="Button:pressed /template/ ContentPresenter">
+                            <Setter Property="Background" Value="#059669"/>
+                        </Style>
+                    </Button.Styles>
+                </Button>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

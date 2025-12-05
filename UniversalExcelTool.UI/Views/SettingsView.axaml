@@ -12,42 +12,44 @@
     </Design.DataContext>
 
     <ScrollViewer>
-        <StackPanel Margin="28,20,28,28">
-
+        <StackPanel Margin="12">
             <!-- Unsaved Changes Warning -->
             <Border Background="#FEF3C7" 
                     BorderBrush="#FCD34D"
                     BorderThickness="1"
                     CornerRadius="6"
-                    Padding="12,10"
-                    Margin="0,0,0,16"
+                    Padding="10,8"
+                    Margin="0,0,0,12"
                     IsVisible="{Binding HasUnsavedChanges}">
-                <StackPanel Orientation="Horizontal" Spacing="10">
-                    <TextBlock Text="⚠️" FontSize="16" VerticalAlignment="Center"/>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="⚠️" FontSize="14" VerticalAlignment="Center"/>
                     <TextBlock Text="You have unsaved changes. Click 'Save Changes' to apply them."
-                               FontSize="12"
+                               FontSize="11"
                                Foreground="#92400E"
                                TextWrapping="Wrap"
                                VerticalAlignment="Center"/>
                 </StackPanel>
             </Border>
 
-            <!-- Database Connection Section -->
-            <Border Background="White"
-                    BorderBrush="#E5E7EB"
-                    BorderThickness="1"
-                    CornerRadius="8"
-                    Padding="16"
-                    BoxShadow="0 1 3 0 #0000001A"
-                    Margin="0,0,0,14">
-                <StackPanel Spacing="14">
-                    <!-- Section Header -->
-                    <Grid ColumnDefinitions="*,Auto">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
+            <!-- First Grid: Configuration -->
+            <Grid RowDefinitions="Auto,Auto,Auto" Margin="0,0,0,12">
+                
+                <!-- Row 0: Database Connection -->
+                <Border Grid.Row="0" 
+                        Background="White"
+                        BorderBrush="#E5E7EB"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="10"
+                        BoxShadow="0 1 3 0 #0000001A"
+                        Margin="0,0,0,8">
+                    <Grid ColumnDefinitions="*,Auto,Auto">
+                        <!-- Summary Info -->
+                        <StackPanel Orientation="Horizontal" Spacing="10">
                             <Border Background="#EEF2FF"
                                     CornerRadius="6"
-                                    Width="28"
-                                    Height="28"
+                                    Width="32"
+                                    Height="32"
                                     VerticalAlignment="Center">
                                 <TextBlock Text="🗄️" 
                                            FontSize="16" 
@@ -59,28 +61,43 @@
                                            FontSize="14" 
                                            FontWeight="SemiBold"
                                            Foreground="#1A1A1A"/>
-                                <TextBlock Text="Configure SQL Server connection settings"
-                                           FontSize="10"
+                                <TextBlock Text="{Binding DatabaseConnectionSummary, FallbackValue='Click to configure SQL Server connection'}"
+                                           FontSize="11"
                                            Foreground="#6B7280"
                                            Margin="0,2,0,0"/>
                             </StackPanel>
                         </StackPanel>
                         
-                        <Button Grid.Column="1"
-                                Command="{Binding TestConnectionCommand}"
-                                IsEnabled="{Binding !IsBusy}"
+                        <!-- Status Indicator -->
+                        <Border Grid.Column="1" 
+                                Background="{Binding IsConnectionConfigured, Converter={StaticResource BoolToStatusColorConverter}, FallbackValue=#FEF3C7}"
+                                BorderBrush="{Binding IsConnectionConfigured, Converter={StaticResource BoolToStatusBorderConverter}, FallbackValue=#FCD34D}"
+                                BorderThickness="1"
+                                CornerRadius="10"
+                                Padding="8,2"
+                                Margin="0,0,10,0"
+                                VerticalAlignment="Center">
+                            <TextBlock Text="{Binding ConnectionStatusText, FallbackValue='Not Configured'}"
+                                       FontSize="10"
+                                       FontWeight="Medium"
+                                       Foreground="{Binding IsConnectionConfigured, Converter={StaticResource BoolToStatusTextConverter}, FallbackValue=#92400E}"/>
+                        </Border>
+                        
+                        <!-- Configure Button -->
+                        <Button Grid.Column="2"
+                                Command="{Binding OpenDatabaseConfigCommand}"
                                 Height="28"
-                                Padding="10,0"
+                                Padding="12,0"
                                 Background="#007991"
                                 Foreground="White"
                                 BorderThickness="0"
                                 CornerRadius="6"
-                                FontSize="12"
+                                FontSize="11"
                                 FontWeight="Medium"
                                 Cursor="Hand">
                             <StackPanel Orientation="Horizontal" Spacing="6">
-                                <TextBlock Text="🔍" FontSize="11" VerticalAlignment="Center"/>
-                                <TextBlock Text="Test Connection" VerticalAlignment="Center"/>
+                                <TextBlock Text="⚙️" FontSize="11" VerticalAlignment="Center"/>
+                                <TextBlock Text="Configure" VerticalAlignment="Center"/>
                             </StackPanel>
                             <Button.Styles>
                                 <Style Selector="Button:pointerover /template/ ContentPresenter">
@@ -92,349 +109,163 @@
                             </Button.Styles>
                         </Button>
                     </Grid>
+                </Border>
 
-                    <!-- Connection Test Notification Bar -->
-                    <Border Background="{Binding ConnectionSuccess, Converter={StaticResource BoolToNotificationColorConverter}}"
-                            BorderBrush="{Binding ConnectionSuccess, Converter={StaticResource BoolToNotificationBorderConverter}}"
+                <!-- Row 1: Parallel Cards -->
+                <Grid Grid.Row="1" ColumnDefinitions="*,12,*" Margin="0,0,0,8">
+                    <!-- Left Card: Directory Paths -->
+                    <Border Grid.Column="0"
+                            Background="White"
+                            BorderBrush="#E5E7EB"
                             BorderThickness="1"
-                            CornerRadius="6"
-                            Padding="12,10"
-                            Margin="0,0,0,0"
-                            IsVisible="{Binding ShowConnectionNotification}">
-                        <StackPanel Orientation="Horizontal" Spacing="10">
-                            <TextBlock Text="{Binding ConnectionSuccess, Converter={StaticResource BoolToIconConverter}}" 
-                                       FontSize="14" 
-                                       VerticalAlignment="Center"/>
-                            <TextBlock Text="{Binding ConnectionMessage}"
-                                       FontSize="12"
-                                       Foreground="{Binding ConnectionSuccess, Converter={StaticResource BoolToNotificationTextConverter}}"
-                                       TextWrapping="Wrap"
-                                       VerticalAlignment="Center"/>
+                            CornerRadius="8"
+                            Padding="12"
+                            BoxShadow="0 1 3 0 #0000001A">
+                        <StackPanel Spacing="8">
+                            <!-- Header -->
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Border Background="#FEF3C7"
+                                        CornerRadius="6"
+                                        Width="24"
+                                        Height="24"
+                                        VerticalAlignment="Center">
+                                    <TextBlock Text="📁" 
+                                               FontSize="12" 
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                                </Border>
+                                <TextBlock Text="Directory Paths" 
+                                           FontSize="13" 
+                                           FontWeight="SemiBold"
+                                           Foreground="#1A1A1A"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                            
+                            <!-- Fields -->
+                            <StackPanel Spacing="6">
+                                <StackPanel Spacing="2">
+                                    <TextBlock Text="Input Excel Directory" FontSize="11" FontWeight="Medium" Foreground="#374151"/>
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBox Grid.Column="0" Text="{Binding InputExcelPath}" Watermark="E:\Files" Height="28" FontSize="11" CornerRadius="4" Padding="6,0" VerticalContentAlignment="Center"/>
+                                        <Button Grid.Column="1" Command="{Binding BrowseInputExcelPathCommand}" Content="..." Height="28" Width="30" Margin="4,0,0,0" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#F3F4F6" BorderBrush="#D1D5DB" BorderThickness="1" CornerRadius="4"/>
+                                    </Grid>
+                                </StackPanel>
+                                <StackPanel Spacing="2">
+                                    <TextBlock Text="Input CSV Directory" FontSize="11" FontWeight="Medium" Foreground="#374151"/>
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBox Grid.Column="0" Text="{Binding InputCsvPath}" Watermark="E:\Files\CSV" Height="28" FontSize="11" CornerRadius="4" Padding="6,0" VerticalContentAlignment="Center"/>
+                                        <Button Grid.Column="1" Command="{Binding BrowseInputCsvPathCommand}" Content="..." Height="28" Width="30" Margin="4,0,0,0" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#F3F4F6" BorderBrush="#D1D5DB" BorderThickness="1" CornerRadius="4"/>
+                                    </Grid>
+                                </StackPanel>
+                                <StackPanel Spacing="2">
+                                    <TextBlock Text="Output Excel Directory" FontSize="11" FontWeight="Medium" Foreground="#374151"/>
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBox Grid.Column="0" Text="{Binding OutputCsvPath}" Watermark="E:\Files\ExcelFiles" Height="28" FontSize="11" CornerRadius="4" Padding="6,0" VerticalContentAlignment="Center"/>
+                                        <Button Grid.Column="1" Command="{Binding BrowseOutputCsvPathCommand}" Content="..." Height="28" Width="30" Margin="4,0,0,0" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#F3F4F6" BorderBrush="#D1D5DB" BorderThickness="1" CornerRadius="4"/>
+                                    </Grid>
+                                </StackPanel>
+                                <StackPanel Spacing="2">
+                                    <TextBlock Text="Logs Directory" FontSize="11" FontWeight="Medium" Foreground="#374151"/>
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBox Grid.Column="0" Text="{Binding LogsPath}" Watermark="C:\Data\Logs" Height="28" FontSize="11" CornerRadius="4" Padding="6,0" VerticalContentAlignment="Center"/>
+                                        <Button Grid.Column="1" Command="{Binding BrowseLogsPathCommand}" Content="..." Height="28" Width="30" Margin="4,0,0,0" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#F3F4F6" BorderBrush="#D1D5DB" BorderThickness="1" CornerRadius="4"/>
+                                    </Grid>
+                                </StackPanel>
+                            </StackPanel>
                         </StackPanel>
                     </Border>
 
-                    <!-- Connection Fields in 2-Column Grid -->
-                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto">
-                        <!-- Server Name -->
-                        <StackPanel Grid.Column="0" Grid.Row="0" Spacing="6" Margin="0,0,8,0">
-                            <TextBlock Text="Server Name" 
-                                       FontSize="13" 
-                                       FontWeight="Medium"
-                                       Foreground="#1A1A1A"/>
-                            <TextBox Text="{Binding DatabaseServer}"
-                                     Watermark="localhost or SERVER\INSTANCE"
-                                     Height="32"
-                                     FontSize="12"
-                                     Padding="10,0"
-                                     VerticalContentAlignment="Center"/>
-                        </StackPanel>
-
-                        <!-- Database Name -->
-                        <StackPanel Grid.Column="1" Grid.Row="0" Spacing="6" Margin="8,0,0,0">
-                            <TextBlock Text="Database Name" 
-                                       FontSize="13" 
-                                       FontWeight="Medium"
-                                       Foreground="#1A1A1A"/>
-                            <TextBox Text="{Binding DatabaseName}"
-                                     Watermark="MyDatabase"
-                                     Height="32"
-                                     FontSize="12"
-                                     Padding="10,0"
-                                     VerticalContentAlignment="Center"/>
-                        </StackPanel>
-
-                        <!-- Authentication Mode -->
-                        <StackPanel Grid.Column="0" Grid.Row="1" Spacing="6" Margin="0,12,8,0">
-                            <TextBlock Text="Authentication Mode" 
-                                       FontSize="13" 
-                                       FontWeight="Medium"
-                                       Foreground="#1A1A1A"/>
-                            <ComboBox SelectedIndex="{Binding AuthenticationMode}"
-                                      Height="32"
-                                      FontSize="12"
-                                      Padding="10,0"
-                                      HorizontalAlignment="Stretch">
-                                <ComboBoxItem Content="Windows Authentication"/>
-                                <ComboBoxItem Content="SQL Server Authentication"/>
-                            </ComboBox>
-                        </StackPanel>
-
-                        <!-- Trust Server Certificate -->
-                        <StackPanel Grid.Column="1" Grid.Row="1" Spacing="6" Margin="8,12,0,0">
-                            <TextBlock Text="Security Options" 
-                                       FontSize="13" 
-                                       FontWeight="Medium"
-                                       Foreground="#1A1A1A"/>
-                            <Border BorderBrush="#D1D5DB"
-                                    BorderThickness="1"
-                                    CornerRadius="6"
-                                    Padding="10,6"
-                                    Background="White"
-                                    Height="32">
-                                <CheckBox IsChecked="{Binding TrustServerCertificate}"
-                                          FontSize="12"
-                                          VerticalAlignment="Center">
-                                    <TextBlock Text="Trust Server Certificate" 
-                                               FontSize="12"
+                    <!-- Right Card: Module Executable Paths -->
+                    <Border Grid.Column="2"
+                            Background="White"
+                            BorderBrush="#E5E7EB"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="12"
+                            BoxShadow="0 1 3 0 #0000001A">
+                        <StackPanel Spacing="8">
+                            <!-- Header -->
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Border Background="#F3E8FF"
+                                        CornerRadius="6"
+                                        Width="24"
+                                        Height="24"
+                                        VerticalAlignment="Center">
+                                    <TextBlock Text="💾" 
+                                               FontSize="12" 
+                                               HorizontalAlignment="Center"
                                                VerticalAlignment="Center"/>
-                                </CheckBox>
-                            </Border>
+                                </Border>
+                                <TextBlock Text="Module Executable Paths" 
+                                           FontSize="13" 
+                                           FontWeight="SemiBold"
+                                           Foreground="#1A1A1A"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                            
+                            <!-- Fields -->
+                            <StackPanel Spacing="6">
+                                <StackPanel Spacing="2">
+                                    <TextBlock Text="Dynamic Table Manager" FontSize="11" FontWeight="Medium" Foreground="#374151"/>
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBox Grid.Column="0" Text="{Binding DynamicTableManagerPath}" Watermark="Path to executable" Height="28" FontSize="11" CornerRadius="4" Padding="6,0" VerticalContentAlignment="Center"/>
+                                        <Button Grid.Column="1" Command="{Binding BrowseDynamicTableManagerPathCommand}" Content="..." Height="28" Width="30" Margin="4,0,0,0" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#F3F4F6" BorderBrush="#D1D5DB" BorderThickness="1" CornerRadius="4"/>
+                                    </Grid>
+                                </StackPanel>
+                                <StackPanel Spacing="2">
+                                    <TextBlock Text="Excel Processor" FontSize="11" FontWeight="Medium" Foreground="#374151"/>
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBox Grid.Column="0" Text="{Binding ExcelProcessorPath}" Watermark="Path to executable" Height="28" FontSize="11" CornerRadius="4" Padding="6,0" VerticalContentAlignment="Center"/>
+                                        <Button Grid.Column="1" Command="{Binding BrowseExcelProcessorPathCommand}" Content="..." Height="28" Width="30" Margin="4,0,0,0" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#F3F4F6" BorderBrush="#D1D5DB" BorderThickness="1" CornerRadius="4"/>
+                                    </Grid>
+                                </StackPanel>
+                                <StackPanel Spacing="2">
+                                    <TextBlock Text="Database Loader" FontSize="11" FontWeight="Medium" Foreground="#374151"/>
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBox Grid.Column="0" Text="{Binding DatabaseLoaderPath}" Watermark="Path to executable" Height="28" FontSize="11" CornerRadius="4" Padding="6,0" VerticalContentAlignment="Center"/>
+                                        <Button Grid.Column="1" Command="{Binding BrowseDatabaseLoaderPathCommand}" Content="..." Height="28" Width="30" Margin="4,0,0,0" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#F3F4F6" BorderBrush="#D1D5DB" BorderThickness="1" CornerRadius="4"/>
+                                    </Grid>
+                                </StackPanel>
+                                <StackPanel Spacing="2">
+                                    <TextBlock Text="CSV to Database" FontSize="11" FontWeight="Medium" Foreground="#374151"/>
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBox Grid.Column="0" Text="{Binding CsvToDatabasePath}" Watermark="Path to executable" Height="28" FontSize="11" CornerRadius="4" Padding="6,0" VerticalContentAlignment="Center"/>
+                                        <Button Grid.Column="1" Command="{Binding BrowseCsvToDatabasePathCommand}" Content="..." Height="28" Width="30" Margin="4,0,0,0" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#F3F4F6" BorderBrush="#D1D5DB" BorderThickness="1" CornerRadius="4"/>
+                                    </Grid>
+                                </StackPanel>
+                            </StackPanel>
                         </StackPanel>
+                    </Border>
+                </Grid>
 
-                        <!-- Username (SQL Auth only) -->
-                        <StackPanel Grid.Column="0" Grid.Row="2" 
-                                    Spacing="6" 
-                                    Margin="0,12,8,0"
-                                    IsVisible="{Binding IsSqlAuthentication}">
-                            <TextBlock Text="Username" 
-                                       FontSize="13" 
-                                       FontWeight="Medium"
-                                       Foreground="#1A1A1A"/>
-                            <TextBox Text="{Binding DatabaseUsername}"
-                                     Watermark="sa or username"
-                                     Height="32"
-                                     FontSize="12"
-                                     Padding="10,0"
-                                     VerticalContentAlignment="Center"/>
-                        </StackPanel>
-
-                        <!-- Password (SQL Auth only) -->
-                        <StackPanel Grid.Column="1" Grid.Row="2" 
-                                    Spacing="6" 
-                                    Margin="8,12,0,0"
-                                    IsVisible="{Binding IsSqlAuthentication}">
-                            <TextBlock Text="Password" 
-                                       FontSize="13" 
-                                       FontWeight="Medium"
-                                       Foreground="#1A1A1A"/>
-                            <TextBox Text="{Binding DatabasePassword}"
-                                     Watermark="********"
-                                     PasswordChar="•"
-                                     Height="32"
-                                     FontSize="12"
-                                     Padding="10,0"
-                                     VerticalContentAlignment="Center"/>
-                        </StackPanel>
-                    </Grid>
-
-                    <!-- Generated Connection String Preview -->
-                    <StackPanel Spacing="6" Margin="0,6,0,0">
-                        <TextBlock Text="Connection String Preview" 
-                                   FontSize="12" 
-                                   FontWeight="Medium"
-                                   Foreground="#6B7280"/>
-                        <Border Background="#F9FAFB"
-                                BorderBrush="#E5E7EB"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="10,8">
-                            <TextBlock Text="{Binding ConnectionString}"
-                                       FontSize="11"
-                                       FontFamily="Consolas"
-                                       Foreground="#374151"
-                                       TextWrapping="Wrap"/>
+                <!-- Row 2: Advanced Actions & Save -->
+                <Grid Grid.Row="2" ColumnDefinitions="*,Auto">
+                    <!-- Advanced Actions / Warning -->
+                    <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                        <Border Background="#FEE2E2" CornerRadius="4" Padding="4,2">
+                            <TextBlock Text="⚠️" FontSize="11"/>
                         </Border>
-                    </StackPanel>
-                </StackPanel>
-            </Border>
-
-            <!-- Directory Paths Section -->
-            <Border Background="White"
-                    BorderBrush="#E5E7EB"
-                    BorderThickness="1"
-                    CornerRadius="8"
-                    Padding="16"
-                    BoxShadow="0 1 3 0 #0000001A"
-                    Margin="0,0,0,14">
-                <StackPanel Spacing="14">
-                    <!-- Section Header -->
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <Border Background="#FEF3C7"
-                                CornerRadius="6"
-                                Width="28"
-                                Height="28"
-                                VerticalAlignment="Center">
-                            <TextBlock Text="📁" 
-                                       FontSize="14" 
-                                       HorizontalAlignment="Center"
-                                       VerticalAlignment="Center"/>
-                        </Border>
-                        <StackPanel VerticalAlignment="Center">
-                            <TextBlock Text="Directory Paths" 
-                                       FontSize="14" 
-                                       FontWeight="SemiBold"
-                                       Foreground="#1A1A1A"/>
-                        </StackPanel>
-                    </StackPanel>
-                    
-                    <!-- Input Excel Directory -->
-                    <StackPanel Spacing="6">
-                        <TextBlock Text="Input Excel Directory" 
-                                   FontSize="13" 
-                                   FontWeight="Medium"
-                                   Foreground="#1A1A1A"/>
-                        <TextBlock Text="Location of Excel files to process"
-                                   FontSize="11"
-                                   Foreground="#6B7280"/>
-                        <TextBox Text="{Binding InputExcelPath}"
-                                 Watermark="E:\Files"
-                                 Height="32"
-                                 FontSize="12"
-                                 Padding="10,0"
-                                 VerticalContentAlignment="Center"/>
+                        <TextBlock Text="Note: Restart application to apply changes." 
+                                   FontSize="11" 
+                                   Foreground="#6B7280" 
+                                   VerticalAlignment="Center"/>
                     </StackPanel>
 
-                    <!-- Input CSV Directory -->
-                    <StackPanel Spacing="6">
-                        <TextBlock Text="Input CSV Directory" 
-                                   FontSize="13" 
-                                   FontWeight="Medium"
-                                   Foreground="#1A1A1A"/>
-                        <TextBlock Text="Location of CSV files to process"
-                                   FontSize="11"
-                                   Foreground="#6B7280"/>
-                        <TextBox Text="{Binding InputCsvPath}"
-                                 Watermark="E:\Files\CSV"
-                                 Height="32"
-                                 FontSize="12"
-                                 Padding="10,0"
-                                 VerticalContentAlignment="Center"/>
-                    </StackPanel>
-
-                    <!-- Output Excel Directory -->
-                    <StackPanel Spacing="6">
-                        <TextBlock Text="Output Excel Directory" 
-                                   FontSize="13" 
-                                   FontWeight="Medium"
-                                   Foreground="#1A1A1A"/>
-                        <TextBlock Text="Location for processed Excel output files"
-                                   FontSize="11"
-                                   Foreground="#6B7280"/>
-                        <TextBox Text="{Binding OutputCsvPath}"
-                                 Watermark="E:\Files\ExcelFiles"
-                                 Height="32"
-                                 FontSize="12"
-                                 Padding="10,0"
-                                 VerticalContentAlignment="Center"/>
-                    </StackPanel>
-
-                    <!-- Logs Directory -->
-                    <StackPanel Spacing="6">
-                        <TextBlock Text="Logs Directory" 
-                                   FontSize="13" 
-                                   FontWeight="Medium"
-                                   Foreground="#1A1A1A"/>
-                        <TextBlock Text="Location for ETL execution logs"
-                                   FontSize="11"
-                                   Foreground="#6B7280"/>
-                        <TextBox Text="{Binding LogsPath}"
-                                 Watermark="C:\Data\Logs"
-                                 Height="32"
-                                 FontSize="12"
-                                 Padding="10,0"
-                                 VerticalContentAlignment="Center"/>
-                    </StackPanel>
-                </StackPanel>
-            </Border>
-
-            <!-- Module Executable Paths Section -->
-            <Border Background="White"
-                    BorderBrush="#E5E7EB"
-                    BorderThickness="1"
-                    CornerRadius="8"
-                    Padding="16"
-                    BoxShadow="0 1 3 0 #0000001A"
-                    Margin="0,0,0,14">
-                <StackPanel Spacing="14">
-                    <!-- Section Header -->
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <Border Background="#F3E8FF"
-                                CornerRadius="6"
-                                Width="28"
-                                Height="28"
-                                VerticalAlignment="Center">
-                            <TextBlock Text="💾" 
-                                       FontSize="14" 
-                                       HorizontalAlignment="Center"
-                                       VerticalAlignment="Center"/>
-                        </Border>
-                        <StackPanel VerticalAlignment="Center">
-                            <TextBlock Text="Module Executable Paths" 
-                                       FontSize="14" 
-                                       FontWeight="SemiBold"
-                                       Foreground="#1A1A1A"/>
-                        </StackPanel>
-                    </StackPanel>
-                    
-                    <!-- Dynamic Table Manager -->
-                    <StackPanel Spacing="6">
-                        <TextBlock Text="Dynamic Table Manager" 
-                                   FontSize="13" 
-                                   FontWeight="Medium"
-                                   Foreground="#1A1A1A"/>
-                        <TextBlock Text="Path to ETL_DynamicTableManager.exe"
-                                   FontSize="11"
-                                   Foreground="#6B7280"/>
-                        <TextBox Text="{Binding DynamicTableManagerPath}"
-                                 Watermark="./ETL_DynamicTableManager/bin/Release/net8.0/ETL_DynamicTableManager.exe"
-                                 Height="32"
-                                 FontSize="11"
-                                 Padding="10,0"
-                                 VerticalContentAlignment="Center"/>
-                    </StackPanel>
-
-                    <!-- Excel Processor -->
-                    <StackPanel Spacing="6">
-                        <TextBlock Text="Excel Processor" 
-                                   FontSize="13" 
-                                   FontWeight="Medium"
-                                   Foreground="#1A1A1A"/>
-                        <TextBlock Text="Path to ETL_Excel.exe"
-                                   FontSize="11"
-                                   Foreground="#6B7280"/>
-                        <TextBox Text="{Binding ExcelProcessorPath}"
-                                 Watermark="./ETL_Excel/bin/Release/net8.0/ETL_Excel.exe"
-                                 Height="32"
-                                 FontSize="11"
-                                 Padding="10,0"
-                                 VerticalContentAlignment="Center"/>
-                    </StackPanel>
-
-                    <!-- Database Loader -->
-                    <StackPanel Spacing="6">
-                        <TextBlock Text="Database Loader" 
-                                   FontSize="13" 
-                                   FontWeight="Medium"
-                                   Foreground="#1A1A1A"/>
-                        <TextBlock Text="Path to ETL_ExcelToDatabase.exe"
-                                   FontSize="11"
-                                   Foreground="#6B7280"/>
-                        <TextBox Text="{Binding DatabaseLoaderPath}"
-                                 Watermark="./ETL_ExcelToDatabase/bin/Release/net8.0/ETL_ExcelToDatabase.exe"
-                                 Height="32"
-                                 FontSize="11"
-                                 Padding="10,0"
-                                 VerticalContentAlignment="Center"/>
-                    </StackPanel>
-                </StackPanel>
-            </Border>
-
-            <!-- Action Buttons -->
-            <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,16">
-                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Top">
-                    <Button Command="{Binding SaveSettingsCommand}"
+                    <!-- Save Button -->
+                    <Button Grid.Column="1"
+                            Command="{Binding SaveSettingsCommand}"
                             IsEnabled="{Binding HasUnsavedChanges}"
-                            Height="32"
+                            Height="28"
                             Padding="12,0"
                             Background="#10B981"
                             Foreground="White"
                             BorderThickness="0"
                             CornerRadius="6"
-                            FontSize="12"
+                            FontSize="11"
                             FontWeight="Medium"
                             Cursor="Hand">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <TextBlock Text="💾" FontSize="12" VerticalAlignment="Center"/>
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="💾" FontSize="11" VerticalAlignment="Center"/>
                             <TextBlock Text="Save Changes" VerticalAlignment="Center"/>
                         </StackPanel>
                         <Button.Styles>
@@ -446,190 +277,78 @@
                             </Style>
                         </Button.Styles>
                     </Button>
-                    
-                    <Button Command="{Binding ResetToDefaultsCommand}"
-                            Height="32"
-                            Padding="12,0"
-                            Background="#F3F4F6"
-                            Foreground="#374151"
-                            BorderBrush="#D1D5DB"
-                            BorderThickness="1"
-                            CornerRadius="6"
-                            FontSize="12"
-                            FontWeight="Medium"
-                            Cursor="Hand">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <TextBlock Text="🔄" FontSize="12" VerticalAlignment="Center"/>
-                            <TextBlock Text="Reset" VerticalAlignment="Center"/>
-                        </StackPanel>
-                        <Button.Styles>
-                            <Style Selector="Button:pointerover /template/ ContentPresenter">
-                                <Setter Property="Background" Value="#E5E7EB"/>
-                            </Style>
-                        </Button.Styles>
-                    </Button>
-                </StackPanel>
+                </Grid>
             </Grid>
 
-            <!-- Advanced Actions Section -->
+            <!-- Second Grid: Activity Log -->
             <Border Background="White"
                     BorderBrush="#E5E7EB"
                     BorderThickness="1"
                     CornerRadius="8"
-                    Padding="16"
-                    BoxShadow="0 1 3 0 #0000001A"
-                    Margin="0,0,0,14">
-                <StackPanel Spacing="14">
-                    <!-- Section Header -->
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <Border Background="#FEE2E2"
-                                CornerRadius="6"
-                                Width="28"
-                                Height="28"
-                                VerticalAlignment="Center">
-                            <TextBlock Text="⚠️" 
-                                       FontSize="14" 
-                                       HorizontalAlignment="Center"
-                                       VerticalAlignment="Center"/>
-                        </Border>
-                        <StackPanel VerticalAlignment="Center">
-                            <TextBlock Text="Advanced Actions" 
-                                       FontSize="14" 
-                                       FontWeight="SemiBold"
-                                       Foreground="#1A1A1A"/>
-                        </StackPanel>
-                    </StackPanel>
-                    
-                    <Button Command="{Binding OpenConfigFileCommand}"
-                            HorizontalAlignment="Left"
-                            Height="32"
-                            Padding="12,0"
-                            Background="#F3F4F6"
-                            Foreground="#374151"
-                            BorderBrush="#D1D5DB"
-                            BorderThickness="1"
-                            CornerRadius="6"
-                            FontSize="12"
-                            FontWeight="Medium"
-                            Cursor="Hand">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <TextBlock Text="📄" FontSize="11" VerticalAlignment="Center"/>
-                            <TextBlock Text="Open appsettings.json in Editor" VerticalAlignment="Center"/>
-                        </StackPanel>
-                        <Button.Styles>
-                            <Style Selector="Button:pointerover /template/ ContentPresenter">
-                                <Setter Property="Background" Value="#E5E7EB"/>
-                            </Style>
-                        </Button.Styles>
-                    </Button>
-
-                    <Border Background="#FEF3C7"
-                            BorderBrush="#FCD34D"
-                            BorderThickness="1"
-                            CornerRadius="4"
-                            Padding="10,8"
-                            Margin="0,6,0,0">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <TextBlock Text="⚠️" FontSize="14" VerticalAlignment="Center"/>
-                            <TextBlock Text="Note: After saving settings, restart the application to apply changes."
-                                       TextWrapping="Wrap"
-                                       FontSize="11"
-                                       Foreground="#92400E"
-                                       VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Border>
-                </StackPanel>
-            </Border>
-
-            <!-- Activity Log Viewer -->
-            <Border Background="White"
-                    BorderBrush="#E5E7EB"
-                    BorderThickness="1"
-                    CornerRadius="8"
-                    Padding="16"
+                    Padding="0"
                     BoxShadow="0 1 3 0 #0000001A">
-                <StackPanel>
-                    <!-- Log Header -->
-                    <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,12">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <TextBlock Text="📋" FontSize="14" VerticalAlignment="Center"/>
-                            <TextBlock Text="Activity Log" 
-                                       FontSize="14" 
-                                       FontWeight="SemiBold"
-                                       Foreground="#1A1A1A"
-                                       VerticalAlignment="Center"/>
-                        </StackPanel>
-                        <Border Grid.Column="1"
-                                Background="#F3F4F6"
-                                BorderBrush="#D1D5DB"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="8,4">
-                            <TextBlock Text="{Binding LogEntries.Count, StringFormat='({0} entries)'}"
+                <Grid RowDefinitions="Auto,*">
+                    <!-- Header -->
+                    <Border Grid.Row="0" 
+                            Background="#F9FAFB" 
+                            BorderBrush="#E5E7EB" 
+                            BorderThickness="0,0,0,1"
+                            CornerRadius="8,8,0,0"
+                            Padding="10,8">
+                        <Grid ColumnDefinitions="Auto,*,Auto">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock Text="📋" FontSize="12" VerticalAlignment="Center"/>
+                                <TextBlock Text="Activity Log" 
+                                           FontSize="12" 
+                                           FontWeight="SemiBold" 
+                                           Foreground="#1A1A1A"/>
+                            </StackPanel>
+                            <TextBlock Grid.Column="2" 
+                                       Text="{Binding LogEntries.Count, StringFormat='{}{0} entries'}"
                                        FontSize="11"
-                                       FontWeight="Medium"
                                        Foreground="#6B7280"/>
-                        </Border>
-                    </Grid>
-
-                    <!-- Log Container -->
-                    <Border BorderBrush="#E5E7EB"
-                            BorderThickness="1"
-                            CornerRadius="6"
-                            Height="280"
-                            Background="#FAFBFC">
-                        <ScrollViewer Padding="10"
-                                      HorizontalScrollBarVisibility="Disabled"
-                                      VerticalScrollBarVisibility="Auto">
-                            <ItemsControl ItemsSource="{Binding LogEntries}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border Padding="10,8"
-                                                Margin="0,0,0,6"
-                                                CornerRadius="4"
-                                                Background="Transparent">
-                                            <Border.Styles>
-                                                <Style Selector="Border:pointerover">
-                                                    <Setter Property="Background" Value="#F3F4F6"/>
-                                                </Style>
-                                            </Border.Styles>
-                                            <Grid RowDefinitions="Auto,Auto">
-                                                <!-- First Row: Icon + Timestamp -->
-                                                <StackPanel Grid.Row="0" 
-                                                           Orientation="Horizontal" 
-                                                           Spacing="8"
-                                                           Margin="0,0,0,6">
-                                                    <TextBlock Text="{Binding Icon}"
-                                                               FontSize="13"
-                                                               VerticalAlignment="Center"/>
-                                                    <Border Background="#E5E7EB"
-                                                            CornerRadius="3"
-                                                            Padding="6,2">
-                                                        <TextBlock Text="{Binding Timestamp, StringFormat='HH:mm:ss'}"
-                                                                   FontSize="10"
-                                                                   FontFamily="Consolas"
-                                                                   FontWeight="Medium"
-                                                                   Foreground="#6B7280"/>
-                                                    </Border>
-                                                </StackPanel>
-                                                <!-- Second Row: Message (full width with wrapping) -->
-                                                <TextBlock Grid.Row="1"
-                                                           Text="{Binding Message}"
-                                                           FontSize="12"
-                                                           Foreground="#1A1A1A"
-                                                           TextWrapping="Wrap"
-                                                           MaxWidth="1000"
-                                                           Margin="0,0,0,0"/>
-                                            </Grid>
-                                        </Border>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </ScrollViewer>
+                        </Grid>
                     </Border>
-                </StackPanel>
-            </Border>
 
+                    <!-- Log Table -->
+                    <ScrollViewer Grid.Row="1" Height="120" Padding="0">
+                        <ItemsControl ItemsSource="{Binding LogEntries}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border BorderBrush="#F3F4F6" 
+                                            BorderThickness="0,0,0,1"
+                                            Padding="10,4">
+                                        <Grid ColumnDefinitions="24,60,*">
+                                            <!-- Icon -->
+                                            <TextBlock Grid.Column="0" 
+                                                       Text="{Binding Icon}" 
+                                                       FontSize="12" 
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center"/>
+                                            
+                                            <!-- Timestamp -->
+                                            <TextBlock Grid.Column="1" 
+                                                       Text="{Binding Timestamp, StringFormat='HH:mm:ss'}"
+                                                       FontSize="11"
+                                                       FontFamily="Consolas"
+                                                       Foreground="#6B7280"
+                                                       VerticalAlignment="Center"/>
+                                            
+                                            <!-- Message -->
+                                            <TextBlock Grid.Column="2" 
+                                                       Text="{Binding Message}"
+                                                       FontSize="11"
+                                                       Foreground="#374151"
+                                                       TextWrapping="Wrap"
+                                                       VerticalAlignment="Center"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
         </StackPanel>
     </ScrollViewer>
 
