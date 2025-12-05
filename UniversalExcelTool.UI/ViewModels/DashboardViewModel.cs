@@ -122,7 +122,12 @@ namespace UniversalExcelTool.UI.ViewModels
                 await Task.Run(() =>
                 {
                     string connectionString = _configManager.GetConnectionString();
-                    using var connection = new SqlConnection(connectionString);
+                    
+                    // Create a builder to modify the timeout for this specific check
+                    var builder = new SqlConnectionStringBuilder(connectionString);
+                    builder.ConnectTimeout = 5; // Set 5 second timeout for dashboard check
+                    
+                    using var connection = new SqlConnection(builder.ConnectionString);
                     connection.Open();
                     
                     // Test query

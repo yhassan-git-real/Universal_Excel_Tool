@@ -41,7 +41,6 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -209,113 +208,8 @@
             </Menu>
         </Border>
 
-        <!-- Header Bar -->
-        <Border Grid.Row="1" 
-                Grid.Column="0"
-                Grid.ColumnSpan="2"
-                Background="White"
-                BorderThickness="0,0,0,1"
-                BorderBrush="#E5E7EB"
-                Height="68">
-            <Grid ColumnDefinitions="220,*" Margin="0">
-                <!-- Logo Section in Header -->
-                <Border Grid.Column="0" 
-                        Background="#007991"
-                        BorderThickness="0,0,1,0"
-                        BorderBrush="#E5E7EB">
-                    <StackPanel Orientation="Horizontal" 
-                               Spacing="0" 
-                               Margin="16,0"
-                               VerticalAlignment="Center">
-                        <TextBlock Text="📑" 
-                                   FontSize="30" 
-                                   VerticalAlignment="Center"
-                                   Margin="0,0,10,0"/>
-                        <StackPanel VerticalAlignment="Center" Spacing="3">
-                            <TextBlock Text="Universal Excel Tool" 
-                                       FontSize="13" 
-                                       FontWeight="Bold"
-                                       Foreground="White"
-                                       LetterSpacing="0.1"
-                                       TextTrimming="None"
-                                       TextWrapping="NoWrap"/>
-                            <TextBlock Text="Modern ETL Manager" 
-                                       FontSize="10" 
-                                       FontWeight="SemiBold"
-                                       Foreground="#c5ecf3"
-                                       LetterSpacing="0.5"
-                                       TextTrimming="None"
-                                       TextWrapping="NoWrap"/>
-                        </StackPanel>
-                    </StackPanel>
-                </Border>
-
-                <!-- Page Title Section -->
-                <Grid Grid.Column="1" Margin="32,0,28,0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-
-                    <!-- Page Title -->
-                    <StackPanel Grid.Column="0" 
-                               VerticalAlignment="Center"
-                               Orientation="Horizontal" 
-                               Spacing="12">
-                        <TextBlock Text="{Binding CurrentPageIcon}" 
-                                   FontSize="22" 
-                                   VerticalAlignment="Center"/>
-                        <TextBlock Text="{Binding CurrentPageTitle}" 
-                                   FontSize="20" 
-                                   FontWeight="Bold"
-                                   Foreground="#111827"
-                                   LetterSpacing="0.2"
-                                   VerticalAlignment="Center"/>
-                    </StackPanel>
-
-                    <!-- Header Actions -->
-                    <StackPanel Grid.Column="1" 
-                               Orientation="Horizontal" 
-                               Spacing="14"
-                               VerticalAlignment="Center">
-                        <!-- System Time -->
-                        <Border Background="#F9FAFB"
-                                BorderBrush="#E5E7EB"
-                                BorderThickness="1"
-                                CornerRadius="8"
-                                Padding="12,8">
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <TextBlock Text="🕐" FontSize="13" VerticalAlignment="Center"/>
-                                <TextBlock Text="{Binding CurrentTime, StringFormat='HH:mm:ss'}" 
-                                           FontSize="12"
-                                           FontFamily="Consolas"
-                                           FontWeight="SemiBold"
-                                           Foreground="#374151"
-                                           VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Border>
-                        <!-- User Info -->
-                        <Border Background="#EEF2FF"
-                                BorderBrush="#C7D2FE"
-                                BorderThickness="1"
-                                CornerRadius="8"
-                                Padding="12,8">
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <TextBlock Text="👤" FontSize="13" VerticalAlignment="Center"/>
-                                <TextBlock Text="{Binding UserName}" 
-                                           FontSize="12"
-                                           FontWeight="SemiBold"
-                                           Foreground="#4F46E5"
-                                           VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Border>
-                    </StackPanel>
-                </Grid>
-            </Grid>
-        </Border>
-
         <!-- Navigation Sidebar -->
-        <Border Grid.Row="2"
+        <Border Grid.Row="1"
                 Grid.Column="0" 
                 Background="#007991"
                 BorderThickness="0,0,1,0"
@@ -691,7 +585,7 @@
         </Border>
 
         <!-- Content Area -->
-        <Border Grid.Row="2"
+        <Border Grid.Row="1"
                 Grid.Column="1" 
                 Background="#FAFBFC">
             <ContentControl Content="{Binding CurrentViewModel}" 
@@ -699,7 +593,7 @@
         </Border>
 
         <!-- Footer Bar -->
-        <Border Grid.Row="3" 
+        <Border Grid.Row="2" 
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
                 Background="#F9FAFB"

@@ -613,11 +613,12 @@
                     BorderBrush="#E5E7EB"
                     BorderThickness="1"
                     CornerRadius="6"
-                    Padding="12"
+                    Padding="0"
                     BoxShadow="0 1 2 0 #0000000A"
                     Margin="0,12,0,0">
-                <StackPanel>
-                    <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,0,6">
+                <Grid RowDefinitions="Auto,*">
+                    <!-- Header -->
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="6" Margin="12,10,12,10">
                         <Border Background="#6366F1"
                                 Width="20" Height="20"
                                 CornerRadius="4">
@@ -637,64 +638,83 @@
                         </StackPanel>
                     </StackPanel>
                     
-                    <Border BorderBrush="#E5E7EB"
-                            BorderThickness="1"
-                            CornerRadius="3"
-                            Height="130"
-                            Background="#FAFBFC">
-                        <ScrollViewer Padding="6">
-                            <ItemsControl ItemsSource="{Binding LogEntries}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border Padding="5,3"
-                                                Margin="0,1"
-                                                CornerRadius="3"
-                                                Background="Transparent">
-                                            <Border.Styles>
-                                                <Style Selector="Border:pointerover">
-                                                    <Setter Property="Background" Value="#F3F4F6"/>
-                                                </Style>
-                                            </Border.Styles>
-                                            <Grid ColumnDefinitions="Auto,Auto,*">
-                                                <Border Grid.Column="0"
-                                                        Background="#6366F1"
-                                                        Width="14" Height="14"
-                                                        CornerRadius="7"
-                                                        Margin="0,0,5,0"
-                                                        VerticalAlignment="Center">
-                                                    <TextBlock Text="{Binding Icon}"
-                                                               FontSize="8"
-                                                               Foreground="White"
-                                                               FontWeight="Bold"
-                                                               HorizontalAlignment="Center"
+                    <!-- Log Table -->
+                    <Border Grid.Row="1" 
+                            BorderBrush="#E5E7EB"
+                            BorderThickness="0,1,0,0"
+                            Background="#FAFBFC"
+                            CornerRadius="0,0,6,6"
+                            Height="150">
+                        <Grid RowDefinitions="Auto,*">
+                            <!-- Table Header -->
+                            <Border Grid.Row="0" 
+                                    Background="#F3F4F6" 
+                                    BorderBrush="#E5E7EB" 
+                                    BorderThickness="0,0,0,1" 
+                                    Padding="12,8">
+                                <Grid ColumnDefinitions="40,80,*">
+                                    <TextBlock Grid.Column="0" Text="Type" FontWeight="SemiBold" FontSize="11" Foreground="#4B5563"/>
+                                    <TextBlock Grid.Column="1" Text="Time" FontWeight="SemiBold" FontSize="11" Foreground="#4B5563"/>
+                                    <TextBlock Grid.Column="2" Text="Message" FontWeight="SemiBold" FontSize="11" Foreground="#4B5563"/>
+                                </Grid>
+                            </Border>
+
+                            <!-- Log Entries -->
+                            <ScrollViewer Grid.Row="1" Padding="0">
+                                <ItemsControl ItemsSource="{Binding LogEntries}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Padding="12,8"
+                                                    BorderBrush="#F3F4F6"
+                                                    BorderThickness="0,0,0,1"
+                                                    Background="Transparent">
+                                                <Border.Styles>
+                                                    <Style Selector="Border:pointerover">
+                                                        <Setter Property="Background" Value="#F9FAFB"/>
+                                                    </Style>
+                                                </Border.Styles>
+                                                <Grid ColumnDefinitions="40,80,*">
+                                                    <!-- Icon -->
+                                                    <Border Grid.Column="0"
+                                                            Background="#6366F1"
+                                                            Width="18" Height="18"
+                                                            CornerRadius="9"
+                                                            HorizontalAlignment="Left"
+                                                            VerticalAlignment="Center">
+                                                        <TextBlock Text="{Binding Icon}"
+                                                                   FontSize="10"
+                                                                   Foreground="White"
+                                                                   FontWeight="Bold"
+                                                                   HorizontalAlignment="Center"
+                                                                   VerticalAlignment="Center"/>
+                                                    </Border>
+                                                    
+                                                    <!-- Timestamp -->
+                                                    <TextBlock Grid.Column="1"
+                                                               Text="{Binding Timestamp, StringFormat='HH:mm:ss'}"
+                                                               FontSize="11"
+                                                               FontFamily="Cascadia Code, Consolas, monospace"
+                                                               FontWeight="Medium"
+                                                               Foreground="#6B7280"
                                                                VerticalAlignment="Center"/>
-                                                </Border>
-                                                <Border Grid.Column="1"
-                                                        Background="#E5E7EB"
-                                                        CornerRadius="2"
-                                                        Padding="4,1"
-                                                        Margin="0,0,5,0">
-                                                    <TextBlock Text="{Binding Timestamp, StringFormat='HH:mm:ss'}"
-                                                               FontSize="8"
-                                                               FontFamily="Consolas,Monaco,monospace"
-                                                               FontWeight="SemiBold"
-                                                               Foreground="#6B7280"/>
-                                                </Border>
-                                                <TextBlock Grid.Column="2"
-                                                           Text="{Binding Message}"
-                                                           FontSize="10"
-                                                           Foreground="#1F2937"
-                                                           TextWrapping="Wrap"
-                                                           VerticalAlignment="Center"
-                                                           LineHeight="12"/>
-                                            </Grid>
-                                        </Border>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </ScrollViewer>
+                                                    
+                                                    <!-- Message -->
+                                                    <TextBlock Grid.Column="2"
+                                                               Text="{Binding Message}"
+                                                               FontSize="12"
+                                                               Foreground="#1F2937"
+                                                               TextWrapping="Wrap"
+                                                               VerticalAlignment="Center"
+                                                               LineHeight="16"/>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Grid>
                     </Border>
-                </StackPanel>
+                </Grid>
             </Border>
 
         </StackPanel>

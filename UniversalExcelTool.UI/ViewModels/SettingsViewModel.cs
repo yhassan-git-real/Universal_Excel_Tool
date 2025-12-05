@@ -11,6 +11,7 @@ using UniversalExcelTool.Core;
 using Newtonsoft.Json.Linq;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Microsoft.Data.SqlClient;
 
 namespace UniversalExcelTool.UI.ViewModels
 {
@@ -398,6 +399,9 @@ namespace UniversalExcelTool.UI.ViewModels
                 // Write to file
                 await File.WriteAllTextAsync(_appSettingsPath, _currentConfig.ToString());
 
+                // Reload configuration in manager to apply changes immediately
+                _configManager.LoadConfiguration();
+
                 HasUnsavedChanges = false;
                 _logger.LogInfo("Settings saved successfully", "settings");
             }
@@ -410,10 +414,22 @@ namespace UniversalExcelTool.UI.ViewModels
         [RelayCommand]
         private async Task TestConnectionAsync()
         {
+            if (IsBusy) return;
+
             try
             {
+                IsBusy = true;
                 _logger.LogInfo("Testing database connection...", "settings");
                 BuildConnectionString();
+
+                // Reset status
+                ShowConnectionNotification = false;
+
+                // Real connection test
+                using (var connection = new SqlConnection(ConnectionString))
+                {
+                    await connection.OpenAsync();
+                }
 
                 ShowConnectionNotification = true;
                 ConnectionSuccess = true;
@@ -427,6 +443,10 @@ namespace UniversalExcelTool.UI.ViewModels
                 ConnectionSuccess = false;
                 ConnectionMessage = $"Connection failed: {ex.Message}";
                 _logger.LogError($"Database connection test failed: {ex.Message}");
+            }
+            finally
+            {
+                IsBusy = false;
             }
         }
 

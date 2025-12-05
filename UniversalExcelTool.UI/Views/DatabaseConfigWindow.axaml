@@ -56,16 +56,19 @@
                         CornerRadius="6"
                         Padding="12,6"
                         IsVisible="{Binding ShowConnectionNotification}">
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <TextBlock Text="{Binding ConnectionSuccess, Converter={StaticResource BoolToIconConverter}}" 
+                    <Grid ColumnDefinitions="Auto,*">
+                        <TextBlock Grid.Column="0"
+                                   Text="{Binding ConnectionSuccess, Converter={StaticResource BoolToIconConverter}}" 
                                    FontSize="14" 
-                                   VerticalAlignment="Center"/>
-                        <TextBlock Text="{Binding ConnectionMessage}"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,8,0"/>
+                        <TextBlock Grid.Column="1"
+                                   Text="{Binding ConnectionMessage}"
                                    FontSize="11"
                                    Foreground="{Binding ConnectionSuccess, Converter={StaticResource BoolToNotificationTextConverter}}"
                                    TextWrapping="Wrap"
                                    VerticalAlignment="Center"/>
-                    </StackPanel>
+                    </Grid>
                 </Border>
 
                 <!-- Connection Fields -->
