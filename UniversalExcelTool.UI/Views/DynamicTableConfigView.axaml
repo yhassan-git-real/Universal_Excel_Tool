@@ -11,714 +11,169 @@
         <vm:DynamicTableConfigViewModel/>
     </Design.DataContext>
 
-    <ScrollViewer>
-        <StackPanel Margin="24,16,24,24" MaxWidth="1200">
-
-            <!-- Page Header -->
-            <StackPanel Margin="0,0,0,12">
+    <Grid RowDefinitions="Auto,Auto,Auto,*" Margin="16">
+        
+        <!-- 1. Header Section -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
+            <StackPanel>
                 <TextBlock Text="Table Configuration" 
                            FontSize="18" 
                            FontWeight="SemiBold"
-                           Foreground="#1F2937"
-                           Margin="0,0,0,2"/>
+                           Foreground="#1F2937"/>
                 <TextBlock Text="Configure and manage dynamic database tables" 
                            FontSize="12" 
-                           Foreground="#6B7280"
-                           Margin="0,0,0,12"/>
+                           Foreground="#6B7280"/>
             </StackPanel>
-
-            <!-- Status Message -->
-            <Border Background="#E0F2FE" 
+            <!-- Status Badge -->
+            <Border Grid.Column="1" 
+                    Background="#E0F2FE" 
                     BorderBrush="#93C5FD"
                     BorderThickness="1"
-                    CornerRadius="4"
-                    Padding="8,6"
-                    Margin="0,0,0,12">
+                    CornerRadius="12"
+                    Padding="10,4"
+                    VerticalAlignment="Center">
                 <StackPanel Orientation="Horizontal" Spacing="6">
-                    <Border Background="#3B82F6"
-                            Width="14" Height="14"
-                            CornerRadius="7"
-                            VerticalAlignment="Center">
-                        <TextBlock Text="✓" 
-                                   FontSize="9"
-                                   FontWeight="Bold"
-                                   Foreground="White"
-                                   HorizontalAlignment="Center"
-                                   VerticalAlignment="Center"/>
-                    </Border>
-                    <TextBlock Text="{Binding StatusMessage}"
-                               FontSize="11"
-                               FontWeight="Medium"
-                               Foreground="#1E40AF"
-                               TextWrapping="Wrap"
-                               VerticalAlignment="Center"/>
+                    <TextBlock Text="✓" FontSize="10" FontWeight="Bold" Foreground="#0284C7" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding StatusMessage}" FontSize="11" FontWeight="Medium" Foreground="#0369A1" VerticalAlignment="Center"/>
                 </StackPanel>
             </Border>
+        </Grid>
 
-            <!-- Wizard Steps in 2-Column Grid Layout -->
-            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto">
-                    
-                <!-- Step 1: Temporary Table (Left Column) -->
-                <Border Grid.Column="0" Grid.Row="0"
-                        Background="White"
-                        BorderBrush="#E5E7EB"
-                        BorderThickness="1"
-                        CornerRadius="6"
-                        Padding="12"
-                        BoxShadow="0 1 2 0 #0000000A"
-                        Margin="0,0,6,0">
-                    <StackPanel Spacing="10">
-                        <!-- Step Header -->
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <Border Background="#6366F1"
-                                    CornerRadius="6"
-                                    Width="28"
-                                    Height="28"
-                                    VerticalAlignment="Top">
-                                <TextBlock Text="1" 
-                                           FontSize="14"
-                                           FontWeight="Bold"
-                                           Foreground="White"
-                                           HorizontalAlignment="Center"
-                                           VerticalAlignment="Center"/>
-                            </Border>
-                            <StackPanel VerticalAlignment="Center" Spacing="1">
-                                <TextBlock Text="Temporary Table" 
-                                           FontSize="13" 
-                                           FontWeight="SemiBold"
-                                           Foreground="#111827"/>
-                                <TextBlock Text="Preloading &amp; validation staging table"
-                                           FontSize="11"
-                                           Foreground="#6B7280"
-                                           TextWrapping="Wrap"/>
-                            </StackPanel>
-                        </StackPanel>
-                        
-                        <!-- Input Field -->
-                        <TextBox Text="{Binding TempTableName}"
-                                 Watermark="e.g., Temp_MyData"
-                                 HorizontalAlignment="Left"
-                                 VerticalAlignment="Center"
-                                 VerticalContentAlignment="Center"
-                                 Height="32"
-                                 MaxWidth="300"
-                                 FontSize="12"
-                                 Padding="10,0"
-                                 CornerRadius="4"
-                                 BorderThickness="1"
-                                 BorderBrush="#D1D5DB"
-                                 Margin="0,2,0,0">
-                            <TextBox.Styles>
-                                <Style Selector="TextBox:focus">
-                                    <Setter Property="BorderBrush" Value="#6366F1"/>
-                                </Style>
-                            </TextBox.Styles>
-                        </TextBox>
-                        
-                        <!-- Info Text -->
-                        <Border Background="#FEF3C7"
-                                BorderBrush="#FCD34D"
-                                BorderThickness="1"
-                                CornerRadius="3"
-                                Padding="6,5">
-                            <StackPanel Orientation="Horizontal" Spacing="5">
-                                <Border Background="#F59E0B"
-                                        Width="12" Height="12"
-                                        CornerRadius="6"
-                                        VerticalAlignment="Top"
-                                        Margin="0,0,0,0">
-                                    <TextBlock Text="i" 
-                                               FontSize="8"
-                                               FontWeight="Bold"
-                                               Foreground="White"
-                                               HorizontalAlignment="Center"
-                                               VerticalAlignment="Center"/>
-                                </Border>
-                                <TextBlock Text="Validates and processes data before moving to final destination"
-                                           FontSize="10"
-                                           Foreground="#92400E"
-                                           TextWrapping="Wrap"
-                                           VerticalAlignment="Center"
-                                           LineHeight="13"/>
-                            </StackPanel>
-                        </Border>
-                        
-                        <!-- Action Button -->
-                        <Button Command="{Binding Step1_NextCommand}"
-                                HorizontalAlignment="Left"
-                                Height="30"
-                                MinWidth="140"
-                                Background="#007991"
-                                Foreground="White"
-                                BorderThickness="0"
-                                CornerRadius="4"
-                                FontSize="11"
-                                FontWeight="Medium"
-                                Padding="14,0"
-                                Margin="0,0,0,0"
-                                Cursor="Hand">
-                            <StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center">
-                                <TextBlock Text="→" FontSize="11" FontWeight="Bold" VerticalAlignment="Center"/>
-                                <TextBlock Text="Next Step" VerticalAlignment="Center"/>
-                            </StackPanel>
-                            <Button.Styles>
-                                <Style Selector="Button:pointerover">
-                                    <Setter Property="Background" Value="#00A8B5"/>
-                                </Style>
-                                <Style Selector="Button:pressed">
-                                    <Setter Property="Background" Value="#006B7D"/>
-                                </Style>
-                            </Button.Styles>
-                        </Button>
-                    </StackPanel>
-                </Border>
-
-                <!-- Step 2: Destination Table (Right Column) -->
-                <Border Grid.Column="1" Grid.Row="0"
-                        Background="White"
-                        BorderBrush="#E5E7EB"
-                        BorderThickness="1"
-                        CornerRadius="6"
-                        Padding="12"
-                        BoxShadow="0 1 2 0 #0000000A"
-                        Margin="6,0,0,0"
-                        IsEnabled="{Binding IsStep2Enabled}">
-                    <Border.Styles>
-                        <Style Selector="Border:not(:disabled)">
-                            <Setter Property="Opacity" Value="1"/>
-                        </Style>
-                        <Style Selector="Border:disabled">
-                            <Setter Property="Opacity" Value="0.5"/>
-                        </Style>
-                    </Border.Styles>
-                    <StackPanel Spacing="10">
-                        <!-- Step Header -->
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <Border Background="#6366F1"
-                                    CornerRadius="6"
-                                    Width="28"
-                                    Height="28"
-                                    VerticalAlignment="Top">
-                                <TextBlock Text="2" 
-                                           FontSize="14"
-                                           FontWeight="Bold"
-                                           Foreground="White"
-                                           HorizontalAlignment="Center"
-                                           VerticalAlignment="Center"/>
-                            </Border>
-                            <StackPanel VerticalAlignment="Center" Spacing="1">
-                                <TextBlock Text="Destination Table" 
-                                           FontSize="13" 
-                                           FontWeight="SemiBold"
-                                           Foreground="#111827"/>
-                                <TextBlock Text="Final data storage location"
-                                           FontSize="11"
-                                           Foreground="#6B7280"
-                                           TextWrapping="Wrap"/>
-                            </StackPanel>
-                        </StackPanel>
-                        
-                        <!-- Input Field -->
-                        <TextBox Text="{Binding DestinationTableName}"
-                                 Watermark="e.g., MyDataTable"
-                                 HorizontalAlignment="Left"
-                                 VerticalAlignment="Center"
-                                 VerticalContentAlignment="Center"
-                                 Height="32"
-                                 MaxWidth="300"
-                                 FontSize="12"
-                                 Padding="10,0"
-                                 CornerRadius="4"
-                                 BorderThickness="1"
-                                 BorderBrush="#D1D5DB"
-                                 Margin="0,2,0,0">
-                            <TextBox.Styles>
-                                <Style Selector="TextBox:focus">
-                                    <Setter Property="BorderBrush" Value="#6366F1"/>
-                                </Style>
-                            </TextBox.Styles>
-                        </TextBox>
-                        
-                        <!-- Action Button -->
-                        <Button Command="{Binding Step2_CheckTableCommand}"
-                                HorizontalAlignment="Left"
-                                Height="30"
-                                MinWidth="160"
-                                Background="#007991"
-                                Foreground="White"
-                                BorderThickness="0"
-                                CornerRadius="4"
-                                FontSize="11"
-                                FontWeight="Medium"
-                                Padding="14,0"
-                                Margin="0,0,0,0"
-                                Cursor="Hand">
-                            <StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center">
-                                <Border Background="#FFFFFF33"
-                                        Width="14" Height="14"
-                                        CornerRadius="7">
-                                    <TextBlock Text="?" 
-                                               FontSize="9"
-                                               FontWeight="Bold"
-                                               Foreground="White"
-                                               HorizontalAlignment="Center"
-                                               VerticalAlignment="Center"/>
-                                </Border>
-                                <TextBlock Text="Check Table Exists" VerticalAlignment="Center"/>
-                            </StackPanel>
-                            <Button.Styles>
-                                <Style Selector="Button:pointerover">
-                                    <Setter Property="Background" Value="#00A8B5"/>
-                                </Style>
-                                <Style Selector="Button:pressed">
-                                    <Setter Property="Background" Value="#006B7D"/>
-                                </Style>
-                            </Button.Styles>
-                        </Button>
-                        
-                        <!-- Table Check Result -->
-                        <Border IsVisible="{Binding TableCheckMessage.Length}"
-                                Background="#F3F4F6"
-                                BorderBrush="#9CA3AF"
-                                BorderThickness="1"
-                                CornerRadius="3"
-                                Padding="6,5">
-                            <StackPanel Orientation="Horizontal" Spacing="5">
-                                <Border Background="#6366F1"
-                                        Width="12" Height="12"
-                                        CornerRadius="6"
-                                        VerticalAlignment="Center">
-                                    <TextBlock Text="✓" 
-                                               FontSize="8"
-                                               FontWeight="Bold"
-                                               Foreground="White"
-                                               HorizontalAlignment="Center"
-                                               VerticalAlignment="Center"/>
-                                </Border>
-                                <TextBlock Text="{Binding TableCheckMessage}"
-                                           FontSize="10"
-                                           FontWeight="Medium"
-                                           Foreground="#374151"
-                                           TextWrapping="Wrap"
-                                           VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Border>
-                    </StackPanel>
-                </Border>
-
-                <!-- Step 3: Options Based on Table Existence (Full Width) -->
-                <Border Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1"
-                        Background="White"
-                        BorderBrush="#E5E7EB"
-                        BorderThickness="1"
-                        CornerRadius="4"
-                        Padding="10"
-                        BoxShadow="0 1 2 0 #0000000A"
-                        Margin="0,12,0,0"
-                        IsEnabled="{Binding IsStep3Enabled}">
-                    <Border.Styles>
-                        <Style Selector="Border:not(:disabled)">
-                            <Setter Property="Opacity" Value="1"/>
-                        </Style>
-                        <Style Selector="Border:disabled">
-                            <Setter Property="Opacity" Value="0.5"/>
-                        </Style>
-                    </Border.Styles>
-                    <StackPanel Spacing="10">
-                        <!-- Step Header -->
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <Border Background="#6366F1"
-                                    CornerRadius="6"
-                                    Width="28"
-                                    Height="28"
-                                    VerticalAlignment="Top">
-                                <TextBlock Text="3" 
-                                           FontSize="14"
-                                           FontWeight="Bold"
-                                           Foreground="White"
-                                           HorizontalAlignment="Center"
-                                           VerticalAlignment="Center"/>
-                            </Border>
-                            <StackPanel VerticalAlignment="Center" Spacing="1">
-                                <TextBlock Text="Configuration Options" 
-                                           FontSize="13" 
-                                           FontWeight="SemiBold"
-                                           Foreground="#111827"/>
-                                <TextBlock Text="Choose how to handle the destination table"
-                                           FontSize="11"
-                                           Foreground="#6B7280"/>
-                            </StackPanel>
-                        </StackPanel>
-                        
-                        <!-- Option A: Table Exists - Truncate -->
-                        <StackPanel IsVisible="{Binding ShowTruncateOption}" Spacing="6">
-                            <Border Background="#FEF3C7" 
-                                    BorderBrush="#FBBF24"
-                                    BorderThickness="1"
-                                    CornerRadius="3"
-                                    Padding="8,5">
-                                <StackPanel Spacing="5">
-                                    <StackPanel Orientation="Horizontal" Spacing="5">
-                                        <Border Background="#F59E0B"
-                                                Width="14" Height="14"
-                                                CornerRadius="7">
-                                            <TextBlock Text="!" 
-                                                       FontSize="10"
-                                                       FontWeight="Bold"
-                                                       Foreground="White"
-                                                       HorizontalAlignment="Center"
-                                                       VerticalAlignment="Center"/>
-                                        </Border>
-                                        <TextBlock Text="WARNING: Table Already Exists" 
-                                                   FontSize="11" 
-                                                   FontWeight="Bold" 
-                                                   Foreground="#92400E"
-                                                   VerticalAlignment="Center"/>
-                                    </StackPanel>
-                                    <TextBlock FontSize="10"
-                                               Foreground="#78350F"
-                                               TextWrapping="Wrap"
-                                               LineHeight="13">
-                                        <Run Text="The table "/><Run Text="{Binding DestinationTableName}"/><Run Text=" already exists in your database."/>
-                                    </TextBlock>
-                                    <TextBlock Text="⚠ Truncating will permanently delete ALL existing data before loading new data!"
-                                               FontSize="10"
-                                               Foreground="#92400E"
-                                               FontWeight="SemiBold"
-                                               TextWrapping="Wrap"
-                                               LineHeight="13"/>
-                                </StackPanel>
-                            </Border>
-                            
-                            <Border Background="#FFFBF5"
-                                    BorderBrush="#FED7AA"
-                                    BorderThickness="1"
-                                    CornerRadius="3"
-                                    Padding="6,4">
-                                <CheckBox IsChecked="{Binding ShouldTruncate}"
-                                          FontSize="10"
-                                          FontWeight="Medium">
-                                    <TextBlock Text="Yes, truncate the existing table before loading new data"
-                                               FontSize="10"
-                                               Foreground="#374151"
-                                               TextWrapping="Wrap"/>
-                                </CheckBox>
-                            </Border>
-                        </StackPanel>
-
-                        <!-- Option B: Table Doesn't Exist - Create New -->
-                        <StackPanel IsVisible="{Binding ShowCreateTableInfo}" Spacing="6">
-                            <Border Background="#D1F2EB" 
-                                    BorderBrush="#6EE7B7"
-                                    BorderThickness="1"
-                                    CornerRadius="3"
-                                    Padding="8,5">
-                                <StackPanel Spacing="5">
-                                    <StackPanel Orientation="Horizontal" Spacing="5">
-                                        <Border Background="#10B981"
-                                                Width="14" Height="14"
-                                                CornerRadius="7">
-                                            <TextBlock Text="i" 
-                                                       FontSize="9"
-                                                       FontWeight="Bold"
-                                                       Foreground="White"
-                                                       HorizontalAlignment="Center"
-                                                       VerticalAlignment="Center"/>
-                                        </Border>
-                                        <TextBlock Text="New Table Will Be Created" 
-                                                   FontSize="11" 
-                                                   FontWeight="Bold" 
-                                                   Foreground="#065F46"
-                                                   VerticalAlignment="Center"/>
-                                    </StackPanel>
-                                    <TextBlock FontSize="10"
-                                               Foreground="#047857"
-                                               TextWrapping="Wrap"
-                                               LineHeight="13">
-                                        <Run Text="The table "/><Run Text="{Binding DestinationTableName}"/><Run Text=" does not exist in your database."/>
-                                    </TextBlock>
-                                    <TextBlock Text="✓ A new table will be automatically created with the same structure as your Excel data (all columns as NVARCHAR(MAX))."
-                                               FontSize="10"
-                                               Foreground="#065F46"
-                                               TextWrapping="Wrap"
-                                               LineHeight="13"/>
-                                </StackPanel>
-                            </Border>
-                            
-                            <Border Background="#F0FDF4"
-                                    BorderBrush="#BBF7D0"
-                                    BorderThickness="1"
-                                    CornerRadius="3"
-                                    Padding="6,4">
-                                <CheckBox IsChecked="{Binding CreateNewTable}"
-                                          IsEnabled="False"
-                                          FontSize="10"
-                                          FontWeight="Medium">
-                                    <TextBlock Text="Create new table based on Excel data structure"
-                                               FontSize="10"
-                                               Foreground="#374151"
-                                               TextWrapping="Wrap"/>
-                                </CheckBox>
-                            </Border>
-                        </StackPanel>
-                        
-                        <!-- Complete Button -->
-                        <Button Command="{Binding Step3_CompleteCommand}"
-                                HorizontalAlignment="Center"
-                                Height="32"
-                                MinWidth="200"
-                                Background="#10B981"
-                                Foreground="White"
-                                BorderThickness="0"
-                                CornerRadius="4"
-                                FontSize="12"
-                                FontWeight="SemiBold"
-                                Padding="20,0"
-                                Margin="0,0,0,0"
-                                Cursor="Hand">
-                            <StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center">
-                                <Border Background="#FFFFFF33"
-                                        Width="14" Height="14"
-                                        CornerRadius="7">
-                                    <TextBlock Text="✓" 
-                                               FontSize="9"
-                                               FontWeight="Bold"
-                                               Foreground="White"
-                                               HorizontalAlignment="Center"
-                                               VerticalAlignment="Center"/>
-                                </Border>
-                                <TextBlock Text="Complete Configuration" VerticalAlignment="Center"/>
-                            </StackPanel>
-                            <Button.Styles>
-                                <Style Selector="Button:pointerover">
-                                    <Setter Property="Background" Value="#059669"/>
-                                </Style>
-                                <Style Selector="Button:pressed">
-                                    <Setter Property="Background" Value="#065F46"/>
-                                </Style>
-                            </Button.Styles>
-                        </Button>
-                    </StackPanel>
-                </Border>
-
-                <!-- Action Buttons (Full Width) -->
-                <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="2"
-                            Orientation="Horizontal" 
-                            Spacing="8"
-                            HorizontalAlignment="Center"
-                            Margin="0,10,0,0"
-                            IsEnabled="{Binding ConfigurationComplete}">
-                    <StackPanel.Styles>
-                        <Style Selector="StackPanel:not(:disabled)">
-                            <Setter Property="Opacity" Value="1"/>
-                        </Style>
-                        <Style Selector="StackPanel:disabled">
-                            <Setter Property="Opacity" Value="0.5"/>
-                        </Style>
-                    </StackPanel.Styles>
-                    
-                    <Button Command="{Binding SaveConfigurationCommand}"
-                            Height="30"
-                            Padding="16,0"
-                            Background="#10B981"
-                            Foreground="White"
-                            BorderThickness="0"
-                            CornerRadius="4"
-                            FontSize="11"
-                            FontWeight="SemiBold"
-                            Cursor="Hand">
-                        <StackPanel Orientation="Horizontal" Spacing="5">
-                            <Border Background="#FFFFFF33"
-                                    Width="14" Height="14"
-                                    CornerRadius="7">
-                                <TextBlock Text="💾" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
-                            <TextBlock Text="Save Configuration" VerticalAlignment="Center"/>
-                        </StackPanel>
-                        <Button.Styles>
-                            <Style Selector="Button:pointerover">
-                                <Setter Property="Background" Value="#059669"/>
-                            </Style>
-                            <Style Selector="Button:pressed">
-                                <Setter Property="Background" Value="#065F46"/>
-                            </Style>
-                        </Button.Styles>
-                    </Button>
-                    
-                    <Button Command="{Binding ResetWizardCommand}"
-                            Height="30"
-                            Padding="12,0"
-                            Background="#FFFFFF"
-                            Foreground="#374151"
-                            BorderBrush="#D1D5DB"
-                            BorderThickness="1"
-                            CornerRadius="4"
-                            FontSize="11"
-                            FontWeight="Medium"
-                            Cursor="Hand">
-                        <StackPanel Orientation="Horizontal" Spacing="5">
-                            <Border Background="#F3F4F6"
-                                    Width="14" Height="14"
-                                    CornerRadius="7">
-                                <TextBlock Text="↻" FontSize="10" FontWeight="Bold" Foreground="#6B7280" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
-                            <TextBlock Text="Reset Wizard" VerticalAlignment="Center"/>
-                        </StackPanel>
-                        <Button.Styles>
-                            <Style Selector="Button:pointerover">
-                                <Setter Property="Background" Value="#F9FAFB"/>
-                                <Setter Property="BorderBrush" Value="#9CA3AF"/>
-                            </Style>
-                            <Style Selector="Button:pressed">
-                                <Setter Property="Background" Value="#F3F4F6"/>
-                            </Style>
-                        </Button.Styles>
-                    </Button>
-                    
-                    <Button Command="{Binding LoadExistingConfigurationCommand}"
-                            Height="30"
-                            Padding="12,0"
-                            Background="#FFFFFF"
-                            Foreground="#374151"
-                            BorderBrush="#D1D5DB"
-                            BorderThickness="1"
-                            CornerRadius="4"
-                            FontSize="11"
-                            FontWeight="Medium"
-                            Cursor="Hand">
-                        <StackPanel Orientation="Horizontal" Spacing="5">
-                            <Border Background="#F3F4F6"
-                                    Width="14" Height="14"
-                                    CornerRadius="7">
-                                <TextBlock Text="📁" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
-                            <TextBlock Text="Load Existing" VerticalAlignment="Center"/>
-                        </StackPanel>
-                        <Button.Styles>
-                            <Style Selector="Button:pointerover">
-                                <Setter Property="Background" Value="#F9FAFB"/>
-                                <Setter Property="BorderBrush" Value="#9CA3AF"/>
-                            </Style>
-                            <Style Selector="Button:pressed">
-                                <Setter Property="Background" Value="#F3F4F6"/>
-                            </Style>
-                        </Button.Styles>
-                    </Button>
-                </StackPanel>
-
-            </Grid>
-
-            <!-- Configuration Log (Full Width Below) -->
-            <Border Background="White"
-                    BorderBrush="#E5E7EB"
-                    BorderThickness="1"
-                    CornerRadius="6"
-                    Padding="0"
-                    BoxShadow="0 1 2 0 #0000000A"
-                    Margin="0,12,0,0">
-                <Grid RowDefinitions="Auto,*">
+        <!-- 2. Main Configuration Grid (3 Horizontal Cards) -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,*,*" Margin="0,0,0,12">
+            
+            <!-- Card 1: Temporary Table -->
+            <Border Grid.Column="0" Margin="0,0,6,0" Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="8" Padding="12" BoxShadow="0 1 2 0 #0000000A">
+                <Grid RowDefinitions="Auto,Auto,Auto,Auto">
                     <!-- Header -->
-                    <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="6" Margin="12,10,12,10">
-                        <Border Background="#6366F1"
-                                Width="20" Height="20"
-                                CornerRadius="4">
-                            <TextBlock Text="📋" 
-                                       FontSize="10"
-                                       HorizontalAlignment="Center"
-                                       VerticalAlignment="Center"/>
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8" Margin="0,0,0,12">
+                        <Border Background="#EEF2FF" Width="28" Height="28" CornerRadius="14">
+                            <TextBlock Text="1" FontSize="14" FontWeight="Bold" Foreground="#4F46E5" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
-                        <StackPanel VerticalAlignment="Center" Spacing="0">
-                            <TextBlock Text="Configuration Log" 
-                                       FontSize="12" 
-                                       FontWeight="SemiBold"
-                                       Foreground="#111827"/>
-                            <TextBlock Text="Track configuration changes and actions"
-                                       FontSize="10"
-                                       Foreground="#6B7280"/>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="Temporary Table" FontSize="13" FontWeight="SemiBold" Foreground="#111827"/>
+                            <TextBlock Text="Staging table" FontSize="11" Foreground="#6B7280"/>
                         </StackPanel>
                     </StackPanel>
                     
-                    <!-- Log Table -->
-                    <Border Grid.Row="1" 
-                            BorderBrush="#E5E7EB"
-                            BorderThickness="0,1,0,0"
-                            Background="#FAFBFC"
-                            CornerRadius="0,0,6,6"
-                            Height="150">
-                        <Grid RowDefinitions="Auto,*">
-                            <!-- Table Header -->
-                            <Border Grid.Row="0" 
-                                    Background="#F3F4F6" 
-                                    BorderBrush="#E5E7EB" 
-                                    BorderThickness="0,0,0,1" 
-                                    Padding="12,8">
-                                <Grid ColumnDefinitions="40,80,*">
-                                    <TextBlock Grid.Column="0" Text="Type" FontWeight="SemiBold" FontSize="11" Foreground="#4B5563"/>
-                                    <TextBlock Grid.Column="1" Text="Time" FontWeight="SemiBold" FontSize="11" Foreground="#4B5563"/>
-                                    <TextBlock Grid.Column="2" Text="Message" FontWeight="SemiBold" FontSize="11" Foreground="#4B5563"/>
-                                </Grid>
-                            </Border>
-
-                            <!-- Log Entries -->
-                            <ScrollViewer Grid.Row="1" Padding="0">
-                                <ItemsControl ItemsSource="{Binding LogEntries}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Border Padding="12,8"
-                                                    BorderBrush="#F3F4F6"
-                                                    BorderThickness="0,0,0,1"
-                                                    Background="Transparent">
-                                                <Border.Styles>
-                                                    <Style Selector="Border:pointerover">
-                                                        <Setter Property="Background" Value="#F9FAFB"/>
-                                                    </Style>
-                                                </Border.Styles>
-                                                <Grid ColumnDefinitions="40,80,*">
-                                                    <!-- Icon -->
-                                                    <Border Grid.Column="0"
-                                                            Background="#6366F1"
-                                                            Width="18" Height="18"
-                                                            CornerRadius="9"
-                                                            HorizontalAlignment="Left"
-                                                            VerticalAlignment="Center">
-                                                        <TextBlock Text="{Binding Icon}"
-                                                                   FontSize="10"
-                                                                   Foreground="White"
-                                                                   FontWeight="Bold"
-                                                                   HorizontalAlignment="Center"
-                                                                   VerticalAlignment="Center"/>
-                                                    </Border>
-                                                    
-                                                    <!-- Timestamp -->
-                                                    <TextBlock Grid.Column="1"
-                                                               Text="{Binding Timestamp, StringFormat='HH:mm:ss'}"
-                                                               FontSize="11"
-                                                               FontFamily="Cascadia Code, Consolas, monospace"
-                                                               FontWeight="Medium"
-                                                               Foreground="#6B7280"
-                                                               VerticalAlignment="Center"/>
-                                                    
-                                                    <!-- Message -->
-                                                    <TextBlock Grid.Column="2"
-                                                               Text="{Binding Message}"
-                                                               FontSize="12"
-                                                               Foreground="#1F2937"
-                                                               TextWrapping="Wrap"
-                                                               VerticalAlignment="Center"
-                                                               LineHeight="16"/>
-                                                </Grid>
-                                            </Border>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </ScrollViewer>
-                        </Grid>
+                    <!-- Input -->
+                    <TextBox Grid.Row="1" Text="{Binding TempTableName}" Watermark="e.g., Temp_MyData" Height="32" CornerRadius="6" FontSize="12" VerticalContentAlignment="Center" Margin="0,0,0,8"/>
+                    
+                    <!-- Info Box -->
+                    <Border Grid.Row="2" Margin="0,0,0,12" Background="#FFFBEB" BorderBrush="#FCD34D" BorderThickness="1" CornerRadius="6" Padding="8,6">
+                        <TextBlock Text="Validates data before final destination" FontSize="11" Foreground="#92400E" TextWrapping="Wrap"/>
                     </Border>
+                    
+                    <!-- Button -->
+                    <Button Grid.Row="3" Command="{Binding Step1_NextCommand}" Content="Next Step" HorizontalAlignment="Stretch" Height="32" Background="#007991" Foreground="White" CornerRadius="6" FontSize="12" FontWeight="Medium"/>
                 </Grid>
             </Border>
 
-        </StackPanel>
-    </ScrollViewer>
+            <!-- Card 2: Destination Table -->
+            <Border Grid.Column="1" Margin="6,0,6,0" Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="8" Padding="12" BoxShadow="0 1 2 0 #0000000A" IsEnabled="{Binding IsStep2Enabled}">
+                <Grid RowDefinitions="Auto,Auto,Auto,Auto">
+                    <!-- Header -->
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8" Margin="0,0,0,12">
+                        <Border Background="#EEF2FF" Width="28" Height="28" CornerRadius="14">
+                            <TextBlock Text="2" FontSize="14" FontWeight="Bold" Foreground="#4F46E5" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="Destination Table" FontSize="13" FontWeight="SemiBold" Foreground="#111827"/>
+                            <TextBlock Text="Final storage" FontSize="11" Foreground="#6B7280"/>
+                        </StackPanel>
+                    </StackPanel>
+                    
+                    <!-- Input -->
+                    <TextBox Grid.Row="1" Text="{Binding DestinationTableName}" Watermark="e.g., MyDataTable" Height="32" CornerRadius="6" FontSize="12" VerticalContentAlignment="Center" Margin="0,0,0,8"/>
+                    
+                    <!-- Check Result -->
+                    <Border Grid.Row="2" Margin="0,0,0,12" IsVisible="{Binding TableCheckMessage.Length}" Background="#F0FDF4" BorderBrush="#86EFAC" BorderThickness="1" CornerRadius="6" Padding="8,6" MinHeight="30">
+                        <TextBlock Text="{Binding TableCheckMessage}" FontSize="11" Foreground="#166534" TextWrapping="Wrap"/>
+                    </Border>
+                    <!-- Spacer if hidden to align buttons -->
+                    <Border Grid.Row="2" Margin="0,0,0,12" IsVisible="{Binding !TableCheckMessage.Length}" Height="30" Background="Transparent"/>
+
+                    <!-- Button -->
+                    <Button Grid.Row="3" Command="{Binding Step2_CheckTableCommand}" Content="Check Table" HorizontalAlignment="Stretch" Height="32" Background="#007991" Foreground="White" CornerRadius="6" FontSize="12" FontWeight="Medium"/>
+                </Grid>
+            </Border>
+
+            <!-- Card 3: Configuration Options -->
+            <Border Grid.Column="2" Margin="6,0,0,0" Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="8" Padding="12" BoxShadow="0 1 2 0 #0000000A" IsEnabled="{Binding IsStep3Enabled}">
+                <Grid RowDefinitions="Auto,*,Auto">
+                    <!-- Header -->
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8" Margin="0,0,0,12">
+                        <Border Background="#EEF2FF" Width="28" Height="28" CornerRadius="14">
+                            <TextBlock Text="3" FontSize="14" FontWeight="Bold" Foreground="#4F46E5" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="Options" FontSize="13" FontWeight="SemiBold" Foreground="#111827"/>
+                            <TextBlock Text="Handle destination" FontSize="11" Foreground="#6B7280"/>
+                        </StackPanel>
+                    </StackPanel>
+                    
+                    <!-- Content Area (Flexible) -->
+                    <StackPanel Grid.Row="1" Spacing="8" VerticalAlignment="Top">
+                        <!-- Truncate Option -->
+                        <StackPanel IsVisible="{Binding ShowTruncateOption}" Spacing="4">
+                            <Border Background="#FEF2F2" BorderBrush="#FECACA" BorderThickness="1" CornerRadius="6" Padding="8">
+                                <TextBlock Text="Table exists. Truncate?" FontSize="11" Foreground="#991B1B" FontWeight="Bold"/>
+                            </Border>
+                            <CheckBox IsChecked="{Binding ShouldTruncate}" Content="Yes, truncate" FontSize="11"/>
+                        </StackPanel>
+
+                        <!-- Create New Option -->
+                        <StackPanel IsVisible="{Binding ShowCreateTableInfo}" Spacing="4">
+                             <Border Background="#ECFDF5" BorderBrush="#A7F3D0" BorderThickness="1" CornerRadius="6" Padding="8">
+                                <TextBlock Text="New table will be created." FontSize="11" Foreground="#065F46" FontWeight="Bold"/>
+                            </Border>
+                            <CheckBox IsChecked="{Binding CreateNewTable}" IsEnabled="False" Content="Create new table" FontSize="11"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Button -->
+                    <Button Grid.Row="2" Command="{Binding Step3_CompleteCommand}" Content="Complete" HorizontalAlignment="Stretch" Height="32" Background="#10B981" Foreground="White" CornerRadius="6" FontSize="12" FontWeight="SemiBold" Margin="0,12,0,0"/>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- 3. Global Actions (Between Grids) -->
+        <Grid Grid.Row="2" ColumnDefinitions="*,Auto" Margin="0,0,0,12" IsEnabled="{Binding ConfigurationComplete}">
+            <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right" Grid.Column="1">
+                <Button Command="{Binding ResetWizardCommand}" Content="Reset" Background="White" BorderBrush="#D1D5DB" BorderThickness="1" Foreground="#374151" CornerRadius="6" Padding="12,6" FontSize="11"/>
+                <Button Command="{Binding LoadExistingConfigurationCommand}" Content="Load Existing" Background="White" BorderBrush="#D1D5DB" BorderThickness="1" Foreground="#374151" CornerRadius="6" Padding="12,6" FontSize="11"/>
+                <Button Command="{Binding SaveConfigurationCommand}" Content="Save Configuration" Background="#10B981" Foreground="White" CornerRadius="6" FontWeight="SemiBold" Padding="16,6" FontSize="11"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- 4. Log Section (Second Grid) -->
+        <Border Grid.Row="3" Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="8" BoxShadow="0 1 2 0 #0000000A">
+            <Grid RowDefinitions="Auto,*">
+                <Border Grid.Row="0" BorderBrush="#E5E7EB" BorderThickness="0,0,0,1" Padding="12,8" Background="#F9FAFB" CornerRadius="8,8,0,0">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Text="📋" FontSize="12" VerticalAlignment="Center"/>
+                        <TextBlock Text="Configuration Log" FontWeight="SemiBold" FontSize="12" Foreground="#374151" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+                <ScrollViewer Grid.Row="1">
+                    <ItemsControl ItemsSource="{Binding LogEntries}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Padding="12,6" BorderBrush="#F3F4F6" BorderThickness="0,0,0,1">
+                                    <Grid ColumnDefinitions="24,60,*">
+                                        <TextBlock Grid.Column="0" Text="{Binding Icon}" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding Timestamp, StringFormat='HH:mm:ss'}" FontSize="11" FontFamily="Cascadia Code, Consolas, monospace" Foreground="#6B7280" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="2" Text="{Binding Message}" FontSize="11" Foreground="#374151" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
+        </Border>
+
+    </Grid>
 
 </UserControl>
 
